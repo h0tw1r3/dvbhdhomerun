@@ -1,0 +1,14 @@
+General:
+
+Kernel Module:
+* Remove unneeded DVB functions.
+
+* Init:
+  * Need error checking in _init function
+
+* Debug
+  * Decide which functions to put under each bit pattern.
+
+
+UserHDHomerun:
+

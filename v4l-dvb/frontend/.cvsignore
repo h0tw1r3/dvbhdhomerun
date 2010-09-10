@@ -1,0 +1,9 @@
+modules.order
+dvbhdhomerun.mod.c
+dvbhdhomerun.ko
+Module.symvers
+Module.markers
+.tmp_versions
+.dvbhdhomerun.o.cmd
+.dvbhdhomerun.mod.o.cmd
+.dvbhdhomerun.ko.cmd

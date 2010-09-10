@@ -1,0 +1,38 @@
+To use it:
+=========
+
+$SRC is the root of the source directory.
+
+First load the kernel module, then start the application and leave
+that running in a cmd prompt.
+
+1) sudo modprobe dvb_hdhomerun
+ 
+Verify with dmesg. Dmesg should say:
+
+"HDHomeRun: Waiting for userspace to connect"
+
+2) cd $SRC/userhdhomerun/
+   make run
+
+If all is well userhdhomerun should end up saying:
+
+"Num of devices = 1"
+...
+"Registered tuner, id from kernel: 0 name: 1210E3DC-0"
+"Registered tuner, id from kernel: 1 name: 1210E3DC-1"
+
+
+
+Applications to play with:
+=========================
+
+sudo apt-get install dvb-apps  
+  (various cmd line tools from linuxtv.org. Try:
+  http://www.linuxtv.org/wiki/index.php/Testing_your_DVB_device )
+
+Kaffeine:
+* apt-get install kaffeine libxine1-all-plugins
+
+.kde/share/apps/kaffeine/scanfile.dvb to add your location if not existing.
+

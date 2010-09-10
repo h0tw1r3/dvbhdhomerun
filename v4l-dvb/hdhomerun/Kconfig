@@ -1,0 +1,8 @@
+config DVB_HDHOMERUN
+	tristate "HDHomeRun blabla"
+	depends on DVB_CORE
+	help
+	  Support for HDHomeRun. This is only a thin shell must of the
+	  fun stuff takes space in userspace.
+
+	  Say Y or M if you own such a device and want to use it.

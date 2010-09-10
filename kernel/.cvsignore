@@ -1,0 +1,7 @@
+modules.order
+Module.*
+*.mod.*
+*.ko
+*.cmd
+.tmp_versions
+kern.log

@@ -1,0 +1,2 @@
+KERNEL=="hdhomerun_data[0-9]*", GROUP="video"
+KERNEL=="hdhomerun_control", GROUP="video"

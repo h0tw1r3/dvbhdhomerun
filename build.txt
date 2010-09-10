@@ -1,0 +1,75 @@
+Ubuntu 9.10 + 10.04:
+===================
+
+$SRC is the root of the source directory.
+
+Kernel:
+------
+
+cd $SRC/kernel
+
+make
+sudo make install
+
+REMARK: You need to do a few things before modprobe'ing the kernel
+module the first time - see "Configuration/Setup" below).
+
+sudo modprobe dvb_hdhomerun (check dmesg for problems)
+
+
+Libhdhomerun:
+------------
+
+Fetch the user space libraries from SiliconDust's homepage:
+http://www.silicondust.com/support/hdhomerun/downloads/linux/
+(currently:
+http://download.silicondust.com/hdhomerun/libhdhomerun_20100828.tgz)
+
+untar the package (tar xvfz libhdhomerun_xxx.tgz) to a directory of
+your choice. In that directory:
+
+cd libhdhomerun
+make
+
+
+Userhdhomerun:
+-------------
+
+sudo apt-get install cmake g++ libqt4-dev  
+     (libraries/tools needed to compile the below)
+
+cd $SRC/userhdhomerun
+
+Open CMakelists.txt and change the LIBHDHOMERUN_PATH to the
+libhdhomerun directory you just untar'ed.
+
+make
+
+REMARK: You need to do a few things before running the app the first
+time - see "Configuration/Setup" below).
+
+make run 
+
+After "make run" leave that cmd prompt running.
+
+
+Configuration/Setup:
+-------------------
+
+You need preform these three steps once before modprobe'ing the kernel
+module and/or running the application:
+
+1) sudo cp $SRC/kernel/61-hdhomerun-rules /etc/udev/rules.d/.
+   (this makes the /dev/hdhomerun_xyz devices part of the "video"
+   group.)
+
+2) sudo service udev restart
+   (sets above udev rule in effect.)
+
+3) sudo usermod -a -G video userXYZ 
+   (Replace userXYZ with you own user. Logout of your session and then
+   login again to have effect. This is to add the user to the "video"
+   group allowing him to use DVB devices. Verify with "groups" in cmd
+   prompt.)
+
+
