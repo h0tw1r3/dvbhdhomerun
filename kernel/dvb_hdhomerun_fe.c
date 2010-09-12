@@ -23,6 +23,7 @@
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/init.h>
+#include <linux/version.h>
 
 #include <linux/platform_device.h>
 
@@ -162,11 +163,19 @@ static void dvb_hdhomerun_fe_release(struct dvb_frontend* fe)
 	kfree(state);
 }
 
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29)
+static int dvb_hdhomerun_fe_get_frontend_algo(struct dvb_frontend *fe)
+#else
 static enum dvbfe_algo dvb_hdhomerun_fe_get_frontend_algo(struct dvb_frontend *fe)
+#endif
 {
 	DEBUG_FUNC(1);
-	return DVBFE_ALGO_HW;
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,29)
+	return 1; // The two drivers that use get_grontend_algo in debian lenny return 1 for HW.
+#else
+	return DVBFE_ALGO_HW; // This is actually 0. hmm.
+#endif
 }
 
 
