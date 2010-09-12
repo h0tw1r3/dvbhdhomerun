@@ -59,7 +59,7 @@ Configuration/Setup:
 You need preform these three steps once before modprobe'ing the kernel
 module and/or running the application:
 
-1) sudo cp $SRC/kernel/61-hdhomerun-rules /etc/udev/rules.d/.
+1) sudo cp $SRC/kernel/61-hdhomerun.rules /etc/udev/rules.d/.
    (this makes the /dev/hdhomerun_xyz devices part of the "video"
    group.)
 
