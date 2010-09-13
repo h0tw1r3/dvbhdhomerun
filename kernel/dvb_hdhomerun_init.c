@@ -194,7 +194,11 @@ static int __devinit dvb_hdhomerun_register(struct dvb_hdhomerun *hdhomerun)
 	if (ret < 0)
 		goto err_remove_mem_frontend;
 
-	hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach, hdhomerun->plat_dev->id);
+	if(hdhomerun->tuner_data.type == 0) {
+	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_dvbc, hdhomerun->plat_dev->id);
+	} else {
+	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_atsc, hdhomerun->plat_dev->id);
+	}
 
 	ret = (hdhomerun->fe == NULL) ? -1 : 0;
 	if (ret < 0)
@@ -284,11 +288,13 @@ static int __devinit dvb_hdhomerun_probe(struct platform_device *plat_dev)
 
 	platform_set_drvdata(plat_dev, hdhomerun);
 
-	ret = dvb_hdhomerun_register(hdhomerun);
-	if (ret < 0) {
-		platform_set_drvdata(plat_dev, NULL);
-		kfree(hdhomerun);
-	}
+	/* ret = dvb_hdhomerun_register(hdhomerun); */
+	/* if (ret < 0) { */
+	/* 	platform_set_drvdata(plat_dev, NULL); */
+	/* 	kfree(hdhomerun); */
+	/* } */
+
+	return 0;
 	return ret;
 }
 
@@ -313,6 +319,7 @@ static int dvb_hdhomerun_remove(struct platform_device *plat_dev)
 int dvb_hdhomerun_register_hdhomerun(struct hdhomerun_register_tuner_data *tuner_data) 
 {
 	int i;
+	int ret;
 	struct dvb_hdhomerun *hdhomerun;
 	struct hdhomerun_register_tuner_data *tmp;
 
@@ -344,6 +351,12 @@ int dvb_hdhomerun_register_hdhomerun(struct hdhomerun_register_tuner_data *tuner
 
 		hdhomerun = platform_get_drvdata(platform_device[hdhomerun_num_of_devices]);
 		hdhomerun->tuner_data = *tuner_data;
+
+		ret = dvb_hdhomerun_register(hdhomerun);
+		if (ret < 0) {
+			platform_set_drvdata(platform_device[hdhomerun_num_of_devices], NULL);
+			kfree(hdhomerun);
+		}
 
 		hdhomerun_num_of_devices++;
 	}

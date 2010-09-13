@@ -36,12 +36,18 @@ using namespace std;
 HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner) 
   : m_device(0), m_stop(false), m_stream(false), m_prevFreq(0),
     m_deviceId(_device_id), m_deviceIP(_device_ip), m_tuner(_tuner),
-    m_kernelId(-1)
+    m_kernelId(-1), m_type(HdhomerunTuner::ATSC)
 {
   m_device = hdhomerun_device_create(m_deviceId, m_deviceIP, m_tuner, NULL);
   
   m_name = hdhomerun_device_get_name(m_device);
-  cout << "Name of device: " << m_name << endl;
+  cout << endl << "Name of device: " << m_name << endl;
+  
+  string type = hdhomerun_device_get_model_str(m_device);
+  cout << "Type of device: " << type << endl;
+  if(type == "hdhomerun_dvbt") {
+    m_type = HdhomerunTuner::DVBC;
+  } 
 
   int tuner = hdhomerun_device_get_tuner(m_device);
   cout << "Tuner: " << tuner << endl;

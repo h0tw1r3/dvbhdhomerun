@@ -52,6 +52,7 @@ struct hdhomerun_register_tuner_data {
 	uint8_t num_of_devices;
 	char name[12];
 	int id;
+	int type;
 };
 
 struct dvbhdhomerun_control_mesg {

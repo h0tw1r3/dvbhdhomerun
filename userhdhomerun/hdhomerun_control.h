@@ -38,7 +38,7 @@ class Control : public QThread
   
   void run();
 
-  bool Ioctl(int _numOfTuners, const std::string& _name, int& _id);
+  bool Ioctl(int _numOfTuners, const std::string& _name, int& _id, int type);
 
  private:
   void ProcessMessages();

@@ -56,6 +56,8 @@ HdhomerunController::HdhomerunController(int _maxDevices)
     }
   }
 
+  cout << endl;
+
   //
   // Create DVB devices 
   //
@@ -65,7 +67,7 @@ HdhomerunController::HdhomerunController(int _maxDevices)
   for(it = m_tuners.begin(); it != m_tuners.end(); ++it) {
     int kernelId = 0;
 
-    if(m_control->Ioctl(numOfDevices * MAX_TUNERS, (*it)->GetName(), kernelId)) {
+    if(m_control->Ioctl(numOfDevices * MAX_TUNERS, (*it)->GetName(), kernelId, (*it)->GetType())) {
       ostringstream stream;
       stream << "/dev/hdhomerun_data" << kernelId;
       (*it)->SetDataDeviceName(stream.str());

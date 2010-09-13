@@ -200,9 +200,10 @@ static int  dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_p
 
 /* Setup/Init functions */
 
+/* DVB_C */
 static struct dvb_frontend_ops dvb_hdhomerun_fe_qam_ops;
 
-struct dvb_frontend *dvb_hdhomerun_fe_attach(int id)
+struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbc(int id)
 {
 	struct dvb_hdhomerun_fe_state* state = NULL;
 
@@ -212,6 +213,7 @@ struct dvb_frontend *dvb_hdhomerun_fe_attach(int id)
 	state = kzalloc(sizeof(struct dvb_hdhomerun_fe_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
+	DEBUG_OUT(HDHOMERUN_FE, "Attaching a DVB-C HDHomeRun id %d\n", id);	
 	DEBUG_OUT(HDHOMERUN_FE, "Attaching id %d\n", id);
 	state->id = id;
 
@@ -257,5 +259,66 @@ static struct dvb_frontend_ops dvb_hdhomerun_fe_qam_ops = {
 	.get_frontend_algo = dvb_hdhomerun_fe_get_frontend_algo,
 };
 
-EXPORT_SYMBOL(dvb_hdhomerun_fe_attach);
+/* ATSC */
+static struct dvb_frontend_ops dvb_hdhomerun_fe_atsc_ops;
+
+struct dvb_frontend *dvb_hdhomerun_fe_attach_atsc(int id)
+{
+	struct dvb_hdhomerun_fe_state* state = NULL;
+
+	DEBUG_FUNC(1);
+
+	/* allocate memory for the internal state */
+	state = kzalloc(sizeof(struct dvb_hdhomerun_fe_state), GFP_KERNEL);
+	if (state == NULL) goto error;
+
+	DEBUG_OUT(HDHOMERUN_FE, "Attaching an ATSC HDHomeRun id %d\n", id);	
+	DEBUG_OUT(HDHOMERUN_FE, "Attaching id %d\n", id);
+	state->id = id;
+
+	/* create dvb_frontend */
+	memcpy(&state->frontend.ops, &dvb_hdhomerun_fe_atsc_ops, sizeof(struct dvb_frontend_ops));
+	state->frontend.demodulator_priv = state;
+	return &state->frontend;
+
+error:
+	kfree(state);
+	return NULL;
+}
+
+static struct dvb_frontend_ops dvb_hdhomerun_fe_atsc_ops = {
+	.info = {
+		.name			= "HDHomeRun ATSC",
+		.type			= FE_ATSC,
+		.frequency_stepsize	= 62500,
+		.frequency_min		= 54000000,
+		.frequency_max		= 858000000,
+		.symbol_rate_min	= (57840000/2)/64,     /* SACLK/64 == (XIN/2)/64 */
+		.symbol_rate_max	= (57840000/2)/4,      /* SACLK/4 */
+		.caps = FE_CAN_FEC_AUTO | FE_CAN_INVERSION_AUTO | 
+		        FE_CAN_QAM_16 | FE_CAN_QAM_64 | FE_CAN_QAM_128 | FE_CAN_QAM_256 | 
+		        FE_CAN_8VSB | FE_CAN_16VSB
+	},
+
+	.release = dvb_hdhomerun_fe_release,
+
+	.init = dvb_hdhomerun_fe_init,
+	.sleep = dvb_hdhomerun_fe_sleep,
+
+	.set_frontend = dvb_hdhomerun_fe_set_frontend,
+	.get_frontend = dvb_hdhomerun_fe_get_frontend,
+
+	.read_status = dvb_hdhomerun_fe_read_status,
+	.read_ber = dvb_hdhomerun_fe_read_ber,
+	.read_signal_strength = dvb_hdhomerun_fe_read_signal_strength,
+	.read_snr = dvb_hdhomerun_fe_read_snr,
+	.read_ucblocks = dvb_hdhomerun_fe_read_ucblocks,
+
+	.tune = dvb_hdhomerun_fe_tune,
+	.get_frontend_algo = dvb_hdhomerun_fe_get_frontend_algo,
+};
+
+
+EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_dvbc);
+EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_atsc);
 

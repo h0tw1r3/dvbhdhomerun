@@ -32,6 +32,13 @@
 class HdhomerunTuner : public QThread
 {
  public:
+  enum Type 
+  {
+    DVBC,
+    ATSC
+  };
+
+ public:
   HdhomerunTuner(int _device_id, int _device_ip, int _tuner);
   ~HdhomerunTuner();
   
@@ -59,6 +66,10 @@ class HdhomerunTuner : public QThread
     return m_kernelId;
   }
 
+  Type GetType() {
+    return m_type;
+  }
+
  private:
   void AddPidToFilter(int _pid);
   void RemovePidFromFilter(int _pid);
@@ -81,6 +92,8 @@ class HdhomerunTuner : public QThread
   int m_tuner;
 
   int m_kernelId;
+
+  Type m_type;
 
   // Name returned from hdhomerun lib
   std::string m_name;
