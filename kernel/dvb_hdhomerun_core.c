@@ -54,7 +54,7 @@ EXPORT_SYMBOL(wait_for_write);
 int userspace_ready = 0; /* Need mutex on this */
 EXPORT_SYMBOL(userspace_ready);
 
-int hdhomerun_debug_mask = 0;
+int hdhomerun_debug_mask = HDHOMERUN_FE;
 module_param(hdhomerun_debug_mask, int, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(hdhomerun_debug_mask, "Mask for debug output\n");
 EXPORT_SYMBOL(hdhomerun_debug_mask);

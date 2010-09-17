@@ -224,6 +224,8 @@ int HdhomerunTuner::ReadStatus()
     }
   }
 
+  cout << "sym qual: " << hdhomerun_status.symbol_error_quality << endl;
+
   return status;
 }
 
