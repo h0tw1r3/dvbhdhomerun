@@ -53,7 +53,7 @@ HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner)
   cout << "Tuner: " << tuner << endl;
 
   int ret = hdhomerun_device_set_tuner_filter(m_device, "0x0000-0x1FFF");
-  cout << "Set initial pass-all filter for tuner: " << tuner << endl;  
+  cout << "Set initial pass-all filter for tuner: " << ret << endl;  
 }
 
 HdhomerunTuner::~HdhomerunTuner()
