@@ -40,7 +40,7 @@
 MODULE_AUTHOR("Villy Thomsen");
 MODULE_DESCRIPTION("DVB frontend for HDHomeRun");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.0.1");
+MODULE_VERSION(HDHOMERUN_VERSION);
 
 struct dvb_hdhomerun_fe_state {
 	struct dvb_frontend frontend;

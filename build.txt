@@ -56,6 +56,10 @@ After "make run" leave that cmd prompt running.
 Configuration/Setup:
 -------------------
 
+Notice: The steps below are only necessary if you run as a "normal"
+user. If you run userhdhomerun using sudo (sudo make run) then they
+are not needed.
+
 You need preform these three steps once before modprobe'ing the kernel
 module and/or running the application:
 

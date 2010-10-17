@@ -5,10 +5,10 @@ IF(COMMAND cmake_policy)
    CMAKE_policy(SET CMP0003 NEW)
 ENDIF(COMMAND cmake_policy)
 
-SET(LIBHDHOMERUN_PATH /home/villyft/src/hdhomerun/20100828/libhdhomerun)
+SET(LIBHDHOMERUN_PATH /usr/lib/libhdhomerun)
 
 SET(QT_USE_QTXML 1)
-FIND_PACKAGE(Qt4 REQUIRED)
+FIND_PACKAGE(Qt4 COMPONENTS QtGui REQUIRED)
 include(${QT_USE_FILE})
 
 SET(CMAKE_BUILD_TYPE Debug)
@@ -39,4 +39,9 @@ ADD_EXECUTABLE(userhdhomerun main.cpp ${userhdhomerun_SRCS})
 TARGET_LINK_LIBRARIES(userhdhomerun
 	${QT_LIBRARIES} 
 	hdhomerun
+)
+
+
+INSTALL(TARGETS userhdhomerun
+  RUNTIME DESTINATION bin
 )

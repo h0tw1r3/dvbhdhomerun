@@ -1,0 +1,99 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# Name of the source package
+psource:=dvbhdhomerun-source
+
+# The short upstream name, used for the module source directory
+sname:=dvbhdhomerun
+
+build:
+	dh_testdir
+	$(MAKE) -C userhdhomerun
+
+clean: 
+	dh_testdir
+	dh_testroot
+	dh_clean
+
+	$(MAKE) -C kernel clean
+	$(MAKE) -C userhdhomerun clean
+
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	dh_installdirs -a usr/share/modass/overrides
+
+	# Add here commands to install the package into debian/dvbhdhomerun-utils.
+	$(MAKE) -C userhdhomerun PREFIX=$(CURDIR)/debian/dvbhdhomerun-utils install
+
+	# Create the directories to install the source into
+	dh_installdirs -p$(psource)  usr/src/modules/$(sname)/debian
+
+	# Copy only the driver source to the proper location
+	cp kernel/*  debian/$(psource)/usr/src/modules/$(sname)
+	# Copy the needed debian/ pieces to the proper location
+	cp debian/*modules.in* \
+		debian/$(psource)/usr/src/modules/$(sname)/debian
+	cp debian/rules debian/changelog debian/copyright \
+		debian/compat debian/$(psource)/usr/src/modules/$(sname)/debian/
+	cd debian/$(psource)/usr/src && tar c modules | bzip2 -9 > $(sname).tar.bz2 && rm -rf modules
+
+	ln -s ../packages/default.sh debian/dvbhdhomerun-utils/usr/share/modass/overrides/dvbhdhomerun-source
+
+	dh_install
+
+# Build architecture-independent files here.
+binary-indep: build install
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs changelog.txt
+	dh_installdocs
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# module-assistant stuff
+PACKAGE = dvbhdhomerun-modules
+MA_DIR ?= /usr/share/modass
+-include $(MA_DIR)/include/generic.make
+-include $(MA_DIR)/include/common-rules.make
+
+kdist_clean: prep-deb-files
+	dh_clean
+	$(MAKE) clean
+
+kdist_config: prep-deb-files
+binary-modules: kdist_config
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+# build and install the module
+	$(MAKE) KVERS=$(KVERS) LINUXSRC=$(KSRC) MODPREFIX=$(CURDIR)/debian/$(PKGNAME)/ install
+	dh_installdocs 
+	dh_installchangelogs
+	dh_compress
+	dh_fixperms
+	dh_installmodules
+	dh_installdeb
+	dh_gencontrol -- -v$(VERSION)
+	dh_md5sums
+	dh_builddeb --destdir=$(DEB_DESTDIR)
+
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install binary-modules kdist kdist_config kdist_image kdist_clean

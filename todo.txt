@@ -12,3 +12,4 @@ Kernel Module:
 
 UserHDHomerun:
 
+* Remove dependency on QT.

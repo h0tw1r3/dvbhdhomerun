@@ -54,7 +54,7 @@ EXPORT_SYMBOL(wait_for_write);
 int userspace_ready = 0; /* Need mutex on this */
 EXPORT_SYMBOL(userspace_ready);
 
-int hdhomerun_debug_mask = HDHOMERUN_FE;
+int hdhomerun_debug_mask = 0x0;
 module_param(hdhomerun_debug_mask, int, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(hdhomerun_debug_mask, "Mask for debug output\n");
 EXPORT_SYMBOL(hdhomerun_debug_mask);
@@ -62,7 +62,7 @@ EXPORT_SYMBOL(hdhomerun_debug_mask);
 MODULE_AUTHOR("Villy Thomsen");
 MODULE_DESCRIPTION("HDHomeRun Driver Core Module");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.0.1");
+MODULE_VERSION(HDHOMERUN_VERSION);
 
 int hdhomerun_control_post_message(struct dvbhdhomerun_control_mesg *mesg) {
 	int ret = -1;

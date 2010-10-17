@@ -47,7 +47,7 @@
 MODULE_AUTHOR("Villy Thomsen");
 MODULE_DESCRIPTION("HDHomeRun Driver Core Module");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.0.1");
+MODULE_VERSION(HDHOMERUN_VERSION);
 
 static ssize_t hdhomerun_control_read(struct file *f, char *buf,
 				      size_t count, loff_t *offset)

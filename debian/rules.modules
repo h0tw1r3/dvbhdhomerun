@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+
+PACKAGE = dvbhdhomerun-modules
+MA_DIR ?= /usr/share/modass
+-include $(MA_DIR)/include/generic.make
+-include $(MA_DIR)/include/common-rules.make
+  
+kdist_config: prep-deb-files
+kdist_clean:
+	$(MAKE) -C $(KSRC) M=$(CURDIR) clean
+
+binary-modules:
+	dh_testroot
+	dh_clean -k
+
+	# Build the module
+	$(MAKE) -C $(KSRC) M=$(CURDIR) modules
+
+	# Install the modules
+	for module in *.ko; do \
+		install -D -m 0644 $$module debian/$(PKGNAME)/lib/modules/$(KVERS)/extra/dvbhdhomerun/$$module; \
+	done
+
+	dh_installdocs
+	dh_installchangelogs
+	dh_compress
+	dh_fixperms
+	dh_installmodules
+	dh_installdeb
+	dh_gencontrol -- -v$(VERSION)
+	dh_md5sums
+	dh_builddeb --destdir=$(DEB_DESTDIR)
+	dh_clean -k
+
+.PHONY: binary-modules kdist kdist_config kdist_image kdist_clean

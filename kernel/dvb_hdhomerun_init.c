@@ -40,7 +40,6 @@
 
 #include "dvb_hdhomerun_init.h"
 
-#define HDHOMERUN_VERSION "0.0.1"
 MODULE_AUTHOR("Villy Thomsen");
 MODULE_DESCRIPTION("HDHomeRun Driver");
 MODULE_LICENSE("GPL");
@@ -84,8 +83,11 @@ static int dvb_hdhomerun_start_feed(struct dvb_demux_feed *feed)
 	if (hdhomerun == NULL)
 		return -EINVAL;
 	
-	printk(KERN_INFO "hdhomerun%d: Tuner: %s start feed: pid = 0x%x index = %d\n",
-	       hdhomerun->instance, hdhomerun->tuner_data.name, feed->pid, feed->index);
+	DEBUG_OUT(HDHOMERUN_STREAM, "hdhomerun%d: Tuner: %s "
+		  "start feed: pid = 0x%x index = %d\n",
+		  hdhomerun->instance, hdhomerun->tuner_data.name, feed->pid, feed->index);
+
+	
 	
 	if (!demux->dmx.frontend)
 		return -EINVAL;
@@ -118,9 +120,9 @@ static int dvb_hdhomerun_stop_feed(struct dvb_demux_feed *feed)
 	if (hdhomerun == NULL)
 		return -EINVAL;
 
-	printk(KERN_INFO "HDHomeRun%d: "
-	       "Stop feed: pid = 0x%x index = %d\n",
-	       hdhomerun->instance, feed->pid, feed->index);
+	DEBUG_OUT(HDHOMERUN_STREAM, "hdhomerun%d: "
+		  "Stop feed: pid = 0x%x index = %d\n",
+		  hdhomerun->instance, feed->pid, feed->index);
 	
 	mutex_lock(&hdhomerun->feedlock);
 	{

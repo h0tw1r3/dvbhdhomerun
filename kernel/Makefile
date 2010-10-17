@@ -19,11 +19,11 @@ dvb_hdhomerun:
 	@echo "Building driver..."
 	$(MAKE) -C $(KERNEL_DIR) SUBDIRS=$(PWD) modules
 
-install:
+install: dvb_hdhomerun
 	$(MAKE) -C $(KERNEL_DIR) SUBDIRS=$(PWD) modules_install
 	depmod -aeF /boot/System.map-$(KERNEL_VERSION)
 
 clean:
 	rm -f *~
 	rm -f Module.symvers Module.markers modules.order
-	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
+#	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean

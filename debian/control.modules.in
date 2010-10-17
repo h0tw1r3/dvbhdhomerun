@@ -1,0 +1,12 @@
+Source: dvbhdhomerun
+Section: unknown
+Priority: optional
+Maintainer: Villy Thomsen <tfylliv@gmail.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.3
+
+Package: dvbhdhomerun-modules-_KVERS_
+Architecture: any
+Provides: dvbhdhomerun-modules
+Description: dvbhdhomerun modules for Linux (kernel _KVERS_).
+ Bla bla

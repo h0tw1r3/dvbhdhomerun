@@ -1,0 +1,42 @@
+# Install packages dvbhdhomerun depends on
+sudo apt-get install module-assistant debhelper build-essential libqt4-xml libqtgui4
+
+### Start, for Jaunty (9.04) and Karmic (9.10)
+wget http://dk.archive.ubuntu.com/ubuntu/pool/universe/libh/libhdhomerun/libhdhomerun1_20100121-0ubuntu2_i386.deb
+sudo dpkg -i libhdhomerun1_20100121-0ubuntu2_i386.deb
+### End
+
+### Start, for Lucid (10.04) or later
+sudo apt-get install libhdhomerun1
+### End
+
+
+# Fetch dvbhomerun packages
+wget --user=dvbhdhomerun --password=dvb ftp://ftp.villyft.dk/jaunty/dvbhdhomerun-source_0.0.1-1_all.deb
+wget --user=dvbhdhomerun --password=dvb ftp://ftp.villyft.dk/jaunty/dvbhdhomerun-utils_0.0.1-1_i386.deb
+
+
+# Install userspace app + source for kernel module
+sudo dpkg -i dvbhdhomerun-utils*
+sudo dpkg -i dvbhdhomerun-source*
+
+# Build + install kernel module automagically
+sudo module-assistant prepare
+sudo module-assistant update
+sudo module-assistant auto-install dvbhdhomerun-source
+
+# run it.
+sudo modprobe dvb_hdhomerun
+sudo userhdhomerun
+# Leave the userhdhomerun running in a prompt, start a new one for the rest.
+
+# Test
+sudo apt-get install dvb-apps w-scan
+
+# Femon prints out the signal strength. Try from a Hdhomerun Config
+# Gui and switch between channels and see what happens.
+femon
+
+# w_scan will scan _everything_ for channels. This takes on my machine
+# ~half an hour, the output is a list of muxes.
+w_scan -f a -A 3 -x

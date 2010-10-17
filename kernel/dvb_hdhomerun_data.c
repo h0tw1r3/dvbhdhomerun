@@ -32,6 +32,7 @@
 #include <linux/miscdevice.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
+#include <linux/slab.h>
 #include <linux/spinlock.h>
 #include <linux/wait.h>
 
@@ -56,7 +57,7 @@ static int hdhomerun_num_of_devices = 0;
 MODULE_AUTHOR("Villy Thomsen");
 MODULE_DESCRIPTION("HDHomeRun driver");
 MODULE_LICENSE("GPL");
-MODULE_VERSION("0.0.1");
+MODULE_VERSION(HDHOMERUN_VERSION);
 
 static ssize_t hdhomerun_data_write(struct file *f, const char __user *buf,
 				       size_t count, loff_t *offset)

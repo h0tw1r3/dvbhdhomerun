@@ -1,0 +1,14 @@
+dvbhdhomerun (0.0.2-1) maverick; urgency=low
+
+  * Version 0.0.2
+  * Ubuntu/Debian packages now possible.
+  * Default debug level = nothing.
+	
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 17 Oct 2010 16:51:49 +0200
+
+dvbhdhomerun (0.0.1-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 03 Oct 2010 23:30:55 +0200

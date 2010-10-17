@@ -1,4 +1,15 @@
-10 sep 2010:
+17 Oct 2010
 
-* version 0.0.1.
+* Version 0.0.2.
+
+* Hopefully ATSC support in linux DVB subsystem. Waiting for testers to report.
+
+* Added /debian in order to create Ubuntu/Debian packages = easier testing.
+  * Various minor fixes to makefiles/Cmake to get that working.
+
+* Default debug level for kernel module is now "nothing".
+
+10 Sep 2010:
+
+* Version 0.0.1.
 * Initial import to sourceforge.

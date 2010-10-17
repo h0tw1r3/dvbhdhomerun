@@ -25,10 +25,11 @@
 extern int hdhomerun_debug_mask;
 
 enum enum_hdhomerun_debug_mask {
-	HDHOMERUN_FUNCTION = 0x1,
-	HDHOMERUN_FE = 0x2,
-	HDHOMERUN_DATA = 0x4,
-	HDHOMERUN_CONTROL = 0x8
+	HDHOMERUN_FUNCTION = 1,
+	HDHOMERUN_FE = 2,
+	HDHOMERUN_DATA = 4,
+	HDHOMERUN_CONTROL = 8,
+	HDHOMERUN_STREAM = 16
 };
 
 #define DEBUG_OUT(level, fmt, args...) if( level & hdhomerun_debug_mask )	\
