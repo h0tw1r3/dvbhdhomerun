@@ -1,5 +1,5 @@
 # Install packages dvbhdhomerun depends on
-sudo apt-get install module-assistant debhelper build-essential libqt4-xml libqtgui4
+sudo apt-get install module-assistant debhelper build-essential
 
 ### Start, for Jaunty (9.04) and Karmic (9.10)
 wget http://dk.archive.ubuntu.com/ubuntu/pool/universe/libh/libhdhomerun/libhdhomerun1_20100121-0ubuntu2_i386.deb
@@ -12,8 +12,9 @@ sudo apt-get install libhdhomerun1
 
 
 # Fetch dvbhomerun packages
-wget --user=dvbhdhomerun --password=dvb ftp://ftp.villyft.dk/jaunty/dvbhdhomerun-source_0.0.1-1_all.deb
-wget --user=dvbhdhomerun --password=dvb ftp://ftp.villyft.dk/jaunty/dvbhdhomerun-utils_0.0.1-1_i386.deb
+# !!! REMARK, TOO OLD, WAIT FOR LAUNCHPAD PACAKGES
+# wget --user=dvbhdhomerun --password=dvb ftp://ftp.villyft.dk/jaunty/dvbhdhomerun-source_0.0.1-1_all.deb
+# wget --user=dvbhdhomerun --password=dvb ftp://ftp.villyft.dk/jaunty/dvbhdhomerun-utils_0.0.1-1_i386.deb
 
 
 # Install userspace app + source for kernel module

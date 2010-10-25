@@ -35,7 +35,7 @@ make
 Userhdhomerun:
 -------------
 
-sudo apt-get install cmake g++ libqt4-dev  
+sudo apt-get install cmake g++
      (libraries/tools needed to compile the below)
 
 cd $SRC/userhdhomerun
