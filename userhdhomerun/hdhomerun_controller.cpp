@@ -81,9 +81,17 @@ HdhomerunController::HdhomerunController(int _maxDevices)
  
 HdhomerunController::~HdhomerunController()
 {
-  // Need to catch ctrl-c somewhere so we can close down nicely.
-
   // Need to stop threads!
+  m_control->stop();
+  delete m_control;
+
+  std::vector<HdhomerunTuner*>::iterator it;
+  for(it = m_tuners.begin(); it != m_tuners.end(); ++it)
+  {
+    HdhomerunTuner* tuner = *(it);
+    tuner->stop();
+    delete tuner;
+  }
 }
 
 

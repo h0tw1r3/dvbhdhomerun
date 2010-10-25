@@ -1,6 +1,17 @@
-17 Oct 2010
+24 Oct 2010
 
-* Version 0.0.2.
+* Version 0.0.2
+
+* ATSC reported ok by testers.
+
+* Removed dependency on QT, now use pthreads.
+
+* Fixed all "leaks" reported by valgrind.
+
+* Catch ctrl-c and close down threads nicely on exit in userhdhomerun.
+
+
+17 Oct 2010
 
 * Hopefully ATSC support in linux DVB subsystem. Waiting for testers to report.
 
@@ -8,6 +19,7 @@
   * Various minor fixes to makefiles/Cmake to get that working.
 
 * Default debug level for kernel module is now "nothing".
+
 
 10 Sep 2010:
 

@@ -22,7 +22,7 @@
 #ifndef _hdhomerun_control_h_
 #define _hdhomerun_control_h_
 
-#include <QThread>
+#include "thread_pthread.h"
 
 #include <fstream>
 #include <queue>
@@ -30,7 +30,7 @@
 
 class HdhomerunController;
 
-class Control : public QThread
+class Control : public ThreadPthread
 {
  public:
   Control(HdhomerunController* _hdhomerun);
@@ -63,8 +63,6 @@ class Control : public QThread
   int m_fdIoctl;
 
   std::queue<dvbhdhomerun_control_mesg> m_messages;
-
-  bool m_stop;
 
   std::string m_device_name;
 

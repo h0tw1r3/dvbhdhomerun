@@ -22,14 +22,14 @@
 #ifndef _hdhomerun_tuner_h_
 #define _hdhomerun_tuner_h_
 
-#include <hdhomerun.h>
+#include "thread_pthread.h"
 
-#include <QThread>
+#include <hdhomerun.h>
 
 #include <string>
 #include <vector>
 
-class HdhomerunTuner : public QThread
+class HdhomerunTuner : public ThreadPthread
 {
  public:
   enum Type 
@@ -78,7 +78,6 @@ class HdhomerunTuner : public QThread
  private:
   struct hdhomerun_device_t* m_device;
 
-  bool m_stop;
   bool m_stream;
   
   std::string m_pes_filter;

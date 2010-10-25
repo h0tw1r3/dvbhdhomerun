@@ -34,7 +34,7 @@
 using namespace std;
 
 HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner) 
-  : m_device(0), m_stop(false), m_stream(false), m_prevFreq(0),
+  : m_device(0), m_stream(false), m_prevFreq(0),
     m_deviceId(_device_id), m_deviceIP(_device_ip), m_tuner(_tuner),
     m_kernelId(-1), m_type(HdhomerunTuner::ATSC)
 {
@@ -43,11 +43,19 @@ HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner)
   m_name = hdhomerun_device_get_name(m_device);
   cout << endl << "Name of device: " << m_name << endl;
   
-  string type = hdhomerun_device_get_model_str(m_device);
-  cout << "Type of device: " << type << endl;
-  if(type == "hdhomerun_dvbt") {
-    m_type = HdhomerunTuner::DVBC;
-  } 
+  const char* tmp = hdhomerun_device_get_model_str(m_device);
+  if(tmp != NULL) {
+    string type(tmp);
+    cout << "Type of device: " << type << endl;
+    if(type == "hdhomerun_dvbt") {
+      m_type = HdhomerunTuner::DVBC;
+    } 
+  }
+  else {
+    cout << "get_model_str from HDHomeRun failed!" << endl;
+    exit(-1);
+  }
+  
 
   int tuner = hdhomerun_device_get_tuner(m_device);
   cout << "Tuner: " << tuner << endl;
@@ -76,7 +84,7 @@ void HdhomerunTuner::run()
   cout << "Open data device: " << m_nameDataDevice << endl;
 
   const int VIDEO_FOR_1_SEC = 20000000 / 8;  // Same number is used on hdhomerun_config. Don't know where they get that from.
-  while(m_stream) {
+  while(m_stream && !m_stop) {
     data = hdhomerun_device_stream_recv(m_device, VIDEO_FOR_1_SEC, &dataSize);
 
     if(dataSize > 0) {

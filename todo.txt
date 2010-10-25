@@ -1,6 +1,10 @@
 General:
 
+* Use launchpad for building packages.
+
+
 Kernel Module:
+
 * Remove unneeded DVB functions.
 
 * Init:
@@ -9,7 +13,14 @@ Kernel Module:
 * Debug
   * Decide which functions to put under each bit pattern.
 
+* SNR ratio in femon etc. Can that be derived from the HDHomeRun.
+
 
 UserHDHomerun:
 
-* Remove dependency on QT.
+* Add locking of tuner.
+
+
+
+Bugs:
+

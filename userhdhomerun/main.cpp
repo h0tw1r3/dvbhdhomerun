@@ -23,22 +23,31 @@
 #include "hdhomerun_controller.h"
 #include "../kernel/dvb_hdhomerun_control_messages.h"
 
-#include <QApplication>
-
 #include <fstream>
 #include <iostream>
+
+#include <signal.h>
 
 #include <sys/ioctl.h>
 
 using namespace std;
 
+bool g_stop = false;
+
+void sigproc(int)
+{
+  cout << "You pressed ctrl-c, stopping" << endl;
+  g_stop = true;
+}
+
 int main(int argc, char* argv[])
 {
-  QApplication app(argc, argv, false);
-
   HdhomerunController hdhomerun(4);
 
-  app.exec();
+  signal(SIGINT, sigproc);
+  while(!g_stop) {
+    usleep(10000000);
+  }
 
   return 0;
 }
