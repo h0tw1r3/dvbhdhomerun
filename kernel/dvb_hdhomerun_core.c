@@ -23,15 +23,16 @@
 #include <linux/sched.h>
 
 #include "dvb_hdhomerun_control.h"
+#include "dvb_hdhomerun_compat.h"
 #include "dvb_hdhomerun_debug.h"
 
 #include "dvb_hdhomerun_core.h"
 
 /* for the control device */
-struct kfifo *control_fifo_user;
+struct kfifo control_fifo_user;
 EXPORT_SYMBOL(control_fifo_user);
 
-struct kfifo *control_fifo_kernel;
+struct kfifo control_fifo_kernel;
 EXPORT_SYMBOL(control_fifo_kernel);
 
 spinlock_t control_spinlock_user;
@@ -70,7 +71,7 @@ int hdhomerun_control_post_message(struct dvbhdhomerun_control_mesg *mesg) {
 	DEBUG_FUNC(1);
 
 	if(userspace_ready) {
-		if(kfifo_put(control_fifo_user, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg)) < sizeof(struct dvbhdhomerun_control_mesg) ) {
+		if(my_kfifo_put(&control_fifo_user, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg)) < sizeof(struct dvbhdhomerun_control_mesg) ) {
 			printk(KERN_CRIT "No buffer space for hdhomerun control device!\n");
 		} else {
 			ret = 1;
@@ -84,14 +85,14 @@ int hdhomerun_control_wait_for_message(struct dvbhdhomerun_control_mesg *mesg) {
 	DEBUG_FUNC(1);
 	wait_for_write = 1;
 	do {
-		if(wait_event_interruptible(control_readq, __kfifo_len(control_fifo_kernel) > 0)) {
+		if(wait_event_interruptible(control_readq, my_kfifo_len(&control_fifo_kernel) > 0)) {
 			DEBUG_OUT(HDHOMERUN_CONTROL,"%s read interrupted\n", __FUNCTION__);
 			wait_for_write = 0;
 			return -ERESTARTSYS;
 		}
-	} while(__kfifo_len(control_fifo_kernel) == 0);
+	} while(my_kfifo_len(&control_fifo_kernel) == 0);
 
-	return kfifo_get(control_fifo_kernel, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg));
+	return my_kfifo_get(&control_fifo_kernel, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg));
 }
 EXPORT_SYMBOL(hdhomerun_control_wait_for_message);
 

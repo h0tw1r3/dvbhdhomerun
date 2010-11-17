@@ -1,9 +1,11 @@
 General:
 
-* Use launchpad for building packages.
+* Use geralds patch for DKMS building.
 
 
 Kernel Module:
+
+* Need to support DVB-T also.
 
 * Remove unneeded DVB functions.
 
@@ -18,7 +20,12 @@ Kernel Module:
 
 UserHDHomerun:
 
+* Option to run as DVB-T. Probably configuration file
+(/etc/dvbhdhomerun).
+
 * Add locking of tuner.
+
+* Run as a daemon via init.d.
 
 
 

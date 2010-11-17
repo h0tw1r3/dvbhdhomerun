@@ -9,14 +9,15 @@ Homepage: http://sourceforge.net/projects/dvbhdhomerun
 Package: dvbhdhomerun-utils
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends} 
-Description: This contains the user space daemon that talks with the HDHomeRun.
- The user space daemon communicates with the kernel driver in 
- order to get requests from DVB applications.
+Description: User space application that talks with the HDHomeRun.
+ The user space daemon communicates with the kernel driver in order to
+ get requests from DVB applications. Feeds those requests to the
+ HDHomeRun via SiliconDusts open source library.
 
 Package: dvbhdhomerun-source
 Architecture: all
 Depends: module-assistant, build-essential, debhelper (>= 7), make, bzip2, linux-headers-generic | linux-headers
-Description: source for the dvbhdhomerun driver.
+Description: Source for the dvbhdhomerun kernel driver.
  This package provides the source code for the dvbhdhomerun kernel modules.
  The dvbhdhomerun package is also required in order to make use of these
  modules. Kernel source or headers are required to compile these modules.

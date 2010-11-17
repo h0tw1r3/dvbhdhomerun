@@ -31,8 +31,8 @@
 
 #define HDHOMERUN_MAX_TUNERS 8
 
-extern struct kfifo *control_fifo_user;
-extern struct kfifo *control_fifo_kernel;
+extern struct kfifo control_fifo_user;
+extern struct kfifo control_fifo_kernel;
 extern int wait_for_write;
 extern int userspace_ready;
 extern wait_queue_head_t control_readq;

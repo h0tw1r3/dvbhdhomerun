@@ -68,7 +68,7 @@ static ssize_t hdhomerun_data_write(struct file *f, const char __user *buf,
 	struct hdhomerun_data_state *state = f->private_data;
 	
 	DEBUG_FUNC(1);
-	DEBUG_OUT(HDHOMERUN_DATA, "Count: %d, offset %lld\n", count, *offset);
+	DEBUG_OUT(HDHOMERUN_DATA, "Count: %Zu, offset %lld\n", count, *offset);
 	
 	user_data = kmalloc(count, GFP_KERNEL);
 	if(!user_data) {

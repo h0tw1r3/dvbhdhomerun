@@ -32,11 +32,13 @@
 #include <linux/miscdevice.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
+#include <linux/slab.h>
 #include <linux/spinlock.h>
 #include <linux/sched.h>
 #include <linux/wait.h>
 
 #include "dvb_hdhomerun_control_messages.h"
+#include "dvb_hdhomerun_compat.h"
 #include "dvb_hdhomerun_init.h"
 #include "dvb_hdhomerun_data.h"
 #include "dvb_hdhomerun_debug.h"
@@ -56,7 +58,7 @@ static ssize_t hdhomerun_control_read(struct file *f, char *buf,
 	ssize_t retval;
 
 	DEBUG_FUNC(HDHOMERUN_CONTROL);
-	DEBUG_OUT(HDHOMERUN_CONTROL, "Count: %d, offset %lld, buf size: %d\n", count, *offset, __kfifo_len(control_fifo_user));
+	DEBUG_OUT(HDHOMERUN_CONTROL, "Count: %Zu, offset %lld, buf size: %d\n", count, *offset, my_kfifo_len(&control_fifo_user));
 
 	if (!buf)
 		return -EINVAL;
@@ -64,20 +66,20 @@ static ssize_t hdhomerun_control_read(struct file *f, char *buf,
 	if (count == 0)
 		return 0;
 
-	if(__kfifo_len(control_fifo_user) == 0)
+	if(my_kfifo_len(&control_fifo_user) == 0)
 		return 0;
 
 	user_data = kmalloc(count, GFP_KERNEL);
 	if (!user_data)
 		return -ENOMEM;
 	
-	retval = kfifo_get(control_fifo_user, user_data, count);
+	retval = my_kfifo_get(&control_fifo_user, user_data, count);
 
 	if(copy_to_user(buf, user_data, retval)) {
 		retval = -EFAULT;
 	} 
 
-	DEBUG_OUT(HDHOMERUN_CONTROL, "retval %d\n", retval);
+	DEBUG_OUT(HDHOMERUN_CONTROL, "retval %Zu\n", retval);
 
 	kfree(user_data);
 	return retval;
@@ -90,7 +92,7 @@ static ssize_t hdhomerun_control_write(struct file *f, const char __user *buf,
 	ssize_t retval = count;
 	
 	DEBUG_FUNC(1);
-	DEBUG_OUT(HDHOMERUN_CONTROL, "Count: %d, offset %lld, buf size: %d\n", count, *offset, __kfifo_len(control_fifo_kernel));
+	DEBUG_OUT(HDHOMERUN_CONTROL, "Count: %Zu, offset %lld, buf size: %d\n", count, *offset, my_kfifo_len(&control_fifo_kernel));
 	
 	user_data = kmalloc(count, GFP_KERNEL);
 	if(!user_data) {
@@ -104,11 +106,11 @@ static ssize_t hdhomerun_control_write(struct file *f, const char __user *buf,
 	}
 	
 	if(wait_for_write) {
-		retval = kfifo_put(control_fifo_kernel, user_data, count);
+		retval = my_kfifo_put(&control_fifo_kernel, user_data, count);
 	} else {
 		DEBUG_OUT(HDHOMERUN_CONTROL, "%s ignoring write\n", __FUNCTION__);
 	}	
-	DEBUG_OUT(HDHOMERUN_CONTROL, "retval %d\n", retval);
+	DEBUG_OUT(HDHOMERUN_CONTROL, "retval %Zu\n", retval);
 	
 	wake_up_interruptible(&control_readq);
 	
@@ -130,15 +132,15 @@ static int hdhomerun_control_release(struct inode *inode, struct file *file)
 {
 	DEBUG_FUNC(1);
 
-	DEBUG_OUT(HDHOMERUN_CONTROL, "Control buf size (user)  : %d\n", __kfifo_len(control_fifo_user));
-	DEBUG_OUT(HDHOMERUN_CONTROL, "Control buf size (kernel): %d\n", __kfifo_len(control_fifo_kernel));
+	DEBUG_OUT(HDHOMERUN_CONTROL, "Control buf size (user)  : %d\n", my_kfifo_len(&control_fifo_user));
+	DEBUG_OUT(HDHOMERUN_CONTROL, "Control buf size (kernel): %d\n", my_kfifo_len(&control_fifo_kernel));
 	
 	/* Clear the contents of the fifo when the user space program
 	   disconnects. We want to start fresh when we reconnect
 	   again. This is probably a problem for the programs using
 	   the /dev/dvb/adapterX/etcY */
-	kfifo_reset(control_fifo_kernel);
-	kfifo_reset(control_fifo_user);
+	kfifo_reset(&control_fifo_kernel);
+	kfifo_reset(&control_fifo_user);
 	
 	wait_for_write = 0; /* need mutex here */
 	userspace_ready =0; /* need mutex here */
@@ -227,13 +229,24 @@ int dvb_hdhomerun_control_init() {
 	}
 
 	/* Buffer for sending message between kernel/userspace */
-	control_fifo_user = kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_user);
-	if (IS_ERR(control_fifo_user)) {
-		return PTR_ERR(control_fifo_user);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
+	control_fifo_user = *(kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_user));
+#else
+	kfifo_alloc(&control_fifo_user, control_bufsize, GFP_KERNEL);
+#endif
+
+	if (IS_ERR(&control_fifo_user)) {
+		return PTR_ERR(&control_fifo_user);
 	}
-	control_fifo_kernel = kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_kernel);
-	if (IS_ERR(control_fifo_kernel)) {
-		return PTR_ERR(control_fifo_kernel);
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
+	control_fifo_kernel = *(kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_kernel));
+#else
+	kfifo_alloc(&control_fifo_kernel, control_bufsize, GFP_KERNEL);
+#endif 
+
+	if (IS_ERR(&control_fifo_kernel)) {
+		return PTR_ERR(&control_fifo_kernel);
 	}
 	init_waitqueue_head(&control_readq);
 
@@ -245,8 +258,10 @@ EXPORT_SYMBOL(dvb_hdhomerun_control_init);
 void dvb_hdhomerun_control_exit() {
 	DEBUG_FUNC(1);
 
-	kfifo_free(control_fifo_user);
-	kfifo_free(control_fifo_kernel);
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)
+	kfifo_free(&control_fifo_user);
+	kfifo_free(&control_fifo_kernel);
+#endif
 
 	misc_deregister(&hdhomerun_control_device);
 }

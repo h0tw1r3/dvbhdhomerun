@@ -26,4 +26,4 @@ install: dvb_hdhomerun
 clean:
 	rm -f *~
 	rm -f Module.symvers Module.markers modules.order
-#	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
+	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
