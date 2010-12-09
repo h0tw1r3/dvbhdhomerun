@@ -1,0 +1,13 @@
+# Types can any of:
+# DVB-C
+# DVB-T
+# ATSC
+
+# You can change the tuner type for each tuner on your HDHomeRun by
+# exchanging the 1210E3DC-X with the serial number of your tuner:
+
+[1210E3DC-0]
+tuner_type=DVB-T
+
+[1210E3DC-1]
+tuner_type=DVB-C

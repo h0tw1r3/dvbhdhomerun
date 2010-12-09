@@ -200,6 +200,65 @@ static int  dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_p
 
 /* Setup/Init functions */
 
+/* DVB_T */
+static struct dvb_frontend_ops dvb_hdhomerun_fe_ofdm_ops;
+
+struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbt(int id)
+{
+        struct dvb_hdhomerun_fe_state* state = NULL;
+
+        DEBUG_FUNC(1);
+
+        /* allocate memory for the internal state */
+        state = kzalloc(sizeof(struct dvb_hdhomerun_fe_state), GFP_KERNEL);
+        if (state == NULL) goto error;
+
+        DEBUG_OUT(HDHOMERUN_FE, "Attaching a DVB-T HDHomeRun id %d\n", id);
+        DEBUG_OUT(HDHOMERUN_FE, "Attaching id %d\n", id);
+        state->id = id;
+
+        /* create dvb_frontend */
+        memcpy(&state->frontend.ops, &dvb_hdhomerun_fe_ofdm_ops, sizeof(struct dvb_frontend_ops));
+        state->frontend.demodulator_priv = state;
+        return &state->frontend;
+
+error:
+        kfree(state);
+        return NULL;
+}
+
+static struct dvb_frontend_ops dvb_hdhomerun_fe_ofdm_ops = {
+        .info = {
+                .name                   = "HDHomeRun DVB-T",
+                .type                   = FE_OFDM,
+                .frequency_stepsize     = 62500,
+                .frequency_min          = 50500000,
+                .frequency_max          = 862000000,
+		.caps =
+		    FE_CAN_FEC_1_2 | FE_CAN_FEC_2_3 | FE_CAN_FEC_3_4 |
+		    FE_CAN_FEC_5_6 | FE_CAN_FEC_7_8 | FE_CAN_FEC_AUTO |
+		    FE_CAN_QPSK | FE_CAN_QAM_16 | FE_CAN_QAM_64 | FE_CAN_QAM_AUTO |
+		    FE_CAN_TRANSMISSION_MODE_AUTO | FE_CAN_GUARD_INTERVAL_AUTO
+        },
+
+        .release = dvb_hdhomerun_fe_release,
+
+        .init = dvb_hdhomerun_fe_init,
+        .sleep = dvb_hdhomerun_fe_sleep,
+
+        .set_frontend = dvb_hdhomerun_fe_set_frontend,
+        .get_frontend = dvb_hdhomerun_fe_get_frontend,
+
+        .read_status = dvb_hdhomerun_fe_read_status,
+        .read_ber = dvb_hdhomerun_fe_read_ber,
+        .read_signal_strength = dvb_hdhomerun_fe_read_signal_strength,
+        .read_snr = dvb_hdhomerun_fe_read_snr,
+        .read_ucblocks = dvb_hdhomerun_fe_read_ucblocks,
+
+        .tune = dvb_hdhomerun_fe_tune,
+        .get_frontend_algo = dvb_hdhomerun_fe_get_frontend_algo,
+};
+
 /* DVB_C */
 static struct dvb_frontend_ops dvb_hdhomerun_fe_qam_ops;
 
@@ -321,4 +380,5 @@ static struct dvb_frontend_ops dvb_hdhomerun_fe_atsc_ops = {
 
 EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_dvbc);
 EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_atsc);
+EXPORT_SYMBOL(dvb_hdhomerun_fe_attach_dvbt);
 

@@ -21,6 +21,8 @@
 
 #include "hdhomerun_tuner.h"
 
+#include "conf_inifile.h"
+
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
@@ -36,27 +38,59 @@ using namespace std;
 HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner) 
   : m_device(0), m_stream(false), m_prevFreq(0),
     m_deviceId(_device_id), m_deviceIP(_device_ip), m_tuner(_tuner),
-    m_kernelId(-1), m_type(HdhomerunTuner::ATSC)
+    m_kernelId(-1), m_type(HdhomerunTuner::NOT_SET)
 {
   m_device = hdhomerun_device_create(m_deviceId, m_deviceIP, m_tuner, NULL);
   
   m_name = hdhomerun_device_get_name(m_device);
   cout << endl << "Name of device: " << m_name << endl;
   
-  const char* tmp = hdhomerun_device_get_model_str(m_device);
-  if(tmp != NULL) {
-    string type(tmp);
-    cout << "Type of device: " << type << endl;
-    if(type == "hdhomerun_dvbt") {
-      m_type = HdhomerunTuner::DVBC;
-    } 
+  ConfIniFile conf;
+  if(conf.OpenIniFile("/etc/dvbhdhomerun")) {
+    string tunerType;
+    if(conf.GetSecValue(m_name, "tuner_type", tunerType)) {
+      if (tunerType == "DVB-T") {
+	m_type = HdhomerunTuner::DVBC;
+      } 
+      else if (tunerType == "DVB-C") {
+	m_type = HdhomerunTuner::DVBT;
+      }
+      else if (tunerType == "ATSC") {
+	m_type = HdhomerunTuner::ATSC;
+      }
+      else {
+	cerr << "Unknown tuner type: " << tunerType << endl;
+      }
+
+      if (m_type != HdhomerunTuner::NOT_SET) {
+	cout << "Tuner type set to \"" << tunerType 
+	     << "\" based on conf file" << endl;
+      }
+    }
   }
   else {
-    cout << "get_model_str from HDHomeRun failed!" << endl;
-    exit(-1);
+    cerr << "No ini file found, using default values" << endl;
+  }
+
+  if(m_type == HdhomerunTuner::NOT_SET) {
+    cout << "Auto detecting tuner type" << endl;
+    const char* tmp = hdhomerun_device_get_model_str(m_device);
+    if(tmp != NULL) {
+      string type(tmp);
+      cout << "Type of device: " << type << endl;
+      if(type == "hdhomerun_dvbt") {
+	m_type = HdhomerunTuner::DVBC;
+      }
+      else if(type == "hdhomerun_atsc") {
+	m_type = HdhomerunTuner::ATSC;
+      }
+    }
+    else {
+      cerr << "get_model_str from HDHomeRun failed!" << endl;
+      exit(-1);
+    }
   }
   
-
   int tuner = hdhomerun_device_get_tuner(m_device);
   cout << "Tuner: " << tuner << endl;
 

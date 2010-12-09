@@ -1,5 +1,5 @@
-Ubuntu 9.10 + 10.04:
-===================
+Ubuntu 9.10, 10.04, 10.10:
+=========================
 
 $SRC is the root of the source directory.
 
@@ -19,6 +19,12 @@ sudo modprobe dvb_hdhomerun (check dmesg for problems)
 
 Libhdhomerun:
 ------------
+
+Normally just install the library: 
+
+	 sudo apt-get install libhdhomerun-dev
+
+If you need to build it yourself:
 
 Fetch the user space libraries from SiliconDust's homepage:
 http://www.silicondust.com/support/hdhomerun/downloads/linux/
@@ -40,8 +46,9 @@ sudo apt-get install cmake g++
 
 cd $SRC/userhdhomerun
 
-Open CMakelists.txt and change the LIBHDHOMERUN_PATH to the
-libhdhomerun directory you just untar'ed.
+(If you compiled the libhdhomerun yourself then Open CMakelists.txt
+and change the LIBHDHOMERUN_PATH to the libhdhomerun directory you
+just untar'ed.)
 
 make
 
@@ -56,9 +63,9 @@ After "make run" leave that cmd prompt running.
 Configuration/Setup:
 -------------------
 
-Notice: The steps below are only necessary if you run as a "normal"
-user. If you run userhdhomerun using sudo (sudo make run) then they
-are not needed.
+Notice: The steps below are only necessary if you run userhdhomerun as
+a "normal" user. If you run userhdhomerun using sudo (sudo make run)
+then they are not needed.
 
 You need preform these three steps once before modprobe'ing the kernel
 module and/or running the application:

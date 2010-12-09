@@ -2,7 +2,7 @@ Source: dvbhdhomerun
 Section: video
 Priority: extra
 Maintainer: Villy Thomsen <tfylliv@gmail.com>
-Build-Depends: debhelper (>= 7), cmake, libqt4-dev, libhdhomerun-dev
+Build-Depends: debhelper (>= 7), cmake, libhdhomerun-dev
 Standards-Version: 3.8.4
 Homepage: http://sourceforge.net/projects/dvbhdhomerun
 

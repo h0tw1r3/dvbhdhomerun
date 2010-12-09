@@ -26,6 +26,7 @@
 
 #if defined(CONFIG_DVB_HDHOMERUN_FE) && defined(MODULE)
 extern struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbc(int id);
+extern struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbt(int id);
 extern struct dvb_frontend *dvb_hdhomerun_fe_attach_atsc(int id);
 #else
 static inline
@@ -34,6 +35,10 @@ struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbc(int id) {
 	return NULL;
 }
 struct dvb_frontend *dvb_hdhomerun_fe_attach_atsc(int id) {
+	printk(KERN_WARNING "%s: driver disabled by Kconfig\n", __func__);
+	return NULL;
+}
+struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbt(int id) {
 	printk(KERN_WARNING "%s: driver disabled by Kconfig\n", __func__);
 	return NULL;
 }

@@ -34,7 +34,9 @@ class HdhomerunTuner : public ThreadPthread
  public:
   enum Type 
   {
+    NOT_SET,
     DVBC,
+    DVBT,
     ATSC
   };
 

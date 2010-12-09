@@ -10,6 +10,7 @@ SET(LIBHDHOMERUN_PATH /usr/lib/libhdhomerun)
 SET(CMAKE_BUILD_TYPE Debug)
 
 SET(userhdhomerun_HDRS
+  conf_inifile.h
   hdhomerun_control.h
   hdhomerun_controller.h
   hdhomerun_tuner.h
@@ -17,6 +18,7 @@ SET(userhdhomerun_HDRS
 )
 
 SET(userhdhomerun_SRCS
+  conf_inifile.cpp
   hdhomerun_control.cpp
   hdhomerun_controller.cpp
   hdhomerun_tuner.cpp

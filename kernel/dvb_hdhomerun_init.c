@@ -196,8 +196,12 @@ static int __devinit dvb_hdhomerun_register(struct dvb_hdhomerun *hdhomerun)
 	if (ret < 0)
 		goto err_remove_mem_frontend;
 
-	if(hdhomerun->tuner_data.type == 0) {
+	if(hdhomerun->tuner_data.type == 1) {
 	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_dvbc, hdhomerun->plat_dev->id);
+	} else if(hdhomerun->tuner_data.type == 2) {
+	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_dvbt, hdhomerun->plat_dev->id);
+	} else if(hdhomerun->tuner_data.type == 3) {
+	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_atsc, hdhomerun->plat_dev->id);
 	} else {
 	  hdhomerun->fe = dvb_attach(dvb_hdhomerun_fe_attach_atsc, hdhomerun->plat_dev->id);
 	}

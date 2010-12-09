@@ -27,7 +27,7 @@
 
 #include "dvb_hdhomerun_control_messages.h"
 
-#define HDHOMERUN_VERSION "0.0.2"
+#define HDHOMERUN_VERSION "0.0.6"
 
 #define HDHOMERUN_MAX_TUNERS 8
 

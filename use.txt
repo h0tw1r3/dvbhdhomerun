@@ -12,8 +12,12 @@ Verify with dmesg. Dmesg should say:
 
 "HDHomeRun: Waiting for userspace to connect"
 
-2) cd $SRC/userhdhomerun/
+2a) If building it yourself:
+   cd $SRC/userhdhomerun/
    make run
+
+2b) If installed from package:
+   sudo userhdhomerun
 
 If all is well userhdhomerun should end up saying:
 

@@ -1,3 +1,12 @@
+8 Dec 2010
+
+* Version 0.0.6
+
+* Configuration file /etc/dvbhdhomerun added. Can now choose between
+  ATSC/DVB-C/DVB-T for each tuner via conf file.
+
+* DVB-T added.
+
 7 Nov 2010
 
 * Compile under Ubuntu 10.10. Kfifo interface changed in kernel
