@@ -49,10 +49,10 @@ HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner)
   if(conf.OpenIniFile("/etc/dvbhdhomerun")) {
     string tunerType;
     if(conf.GetSecValue(m_name, "tuner_type", tunerType)) {
-      if (tunerType == "DVB-T") {
+      if (tunerType == "DVB-C") {
 	m_type = HdhomerunTuner::DVBC;
       } 
-      else if (tunerType == "DVB-C") {
+      else if (tunerType == "DVB-T") {
 	m_type = HdhomerunTuner::DVBT;
       }
       else if (tunerType == "ATSC") {

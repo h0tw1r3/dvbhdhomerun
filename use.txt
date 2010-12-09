@@ -12,9 +12,10 @@ Verify with dmesg. Dmesg should say:
 
 "HDHomeRun: Waiting for userspace to connect"
 
+
 2a) If building it yourself:
    cd $SRC/userhdhomerun/
-   make run
+   sudo make run
 
 2b) If installed from package:
    sudo userhdhomerun

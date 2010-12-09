@@ -1,3 +1,10 @@
+dvbhdhomerun (0.0.7-1) lucid; urgency=low
+
+  * Version 0.0.7
+  * Bug, DVB-T switched with DVB-C in conf file.
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Wed, 09 Dec 2010 21:00:41 +0100
+
 dvbhdhomerun (0.0.6-1) lucid; urgency=low
 
   * Version 0.0.6
