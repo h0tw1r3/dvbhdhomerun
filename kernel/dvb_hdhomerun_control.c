@@ -29,6 +29,7 @@
 #include <linux/kernel.h>
 #include <linux/kfifo.h>
 #include <linux/kobject.h>
+#include <linux/ioctl.h>
 #include <linux/miscdevice.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
@@ -123,6 +124,8 @@ static int hdhomerun_control_open(struct inode *inode, struct file *file)
 {
 	DEBUG_FUNC(1);
 
+	printk(KERN_INFO "hdhomerun: userhdhomerun connected\n");
+
 	userspace_ready = 1; /*  need mutex here */
 
 	return 0;
@@ -144,11 +147,19 @@ static int hdhomerun_control_release(struct inode *inode, struct file *file)
 	
 	wait_for_write = 0; /* need mutex here */
 	userspace_ready =0; /* need mutex here */
-	return 0;
+
+   printk(KERN_INFO "hdhomerun: userhdhomerun disconnected\n");
+
+   return 0;
 }
 
-static int hdhomerun_control_ioctl(struct inode *inode, struct file *f,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
+static long hdhomerun_control_ioctl(struct file *f,
 				   unsigned int cmd, unsigned long arg)
+#else
+static long hdhomerun_control_ioctl(struct inode *inode,struct file *f,
+				    unsigned int cmd, unsigned long arg)
+#endif
 {
 	int retval = 0;
 	int err = 1;
@@ -209,7 +220,11 @@ static struct file_operations hdhomerun_control_fops = {
 	.write = hdhomerun_control_write,
 	.open = hdhomerun_control_open,
 	.release = hdhomerun_control_release,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
+	.unlocked_ioctl = hdhomerun_control_ioctl,
+#else
 	.ioctl = hdhomerun_control_ioctl,
+#endif
 };
   
 static struct miscdevice hdhomerun_control_device = {
