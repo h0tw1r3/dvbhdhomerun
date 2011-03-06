@@ -10,8 +10,7 @@ public:
 
   int start();
   void stop();
-  bool running();
-  bool isFinished();
+  bool isFinished() const;
 
 protected:
   virtual void run() = 0;

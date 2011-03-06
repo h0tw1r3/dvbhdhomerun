@@ -157,7 +157,7 @@ static int hdhomerun_control_release(struct inode *inode, struct file *file)
 static long hdhomerun_control_ioctl(struct file *f,
 				   unsigned int cmd, unsigned long arg)
 #else
-static long hdhomerun_control_ioctl(struct inode *inode,struct file *f,
+static int hdhomerun_control_ioctl(struct inode *inode,struct file *f,
 				    unsigned int cmd, unsigned long arg)
 #endif
 {

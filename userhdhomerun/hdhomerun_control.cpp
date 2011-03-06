@@ -23,6 +23,7 @@
 
 #include "hdhomerun_controller.h"
 #include "hdhomerun_tuner.h"
+#include "log_file.h"
 
 #include "../kernel/dvb_hdhomerun_control_messages.h"
 
@@ -38,7 +39,7 @@ Control::Control(HdhomerunController* _hdhomerun)
 {
   m_write.open(m_device_name.c_str(), ios::binary);
   if(!m_write) {
-    cerr << "Couldn't open: " << m_device_name << endl;
+     ERR() << "Couldn't open: " << m_device_name << endl;
     _exit(-1);
   }
 }
@@ -50,46 +51,46 @@ Control::~Control()
 
 void Control::run()
 {
-  m_read.open(m_device_name.c_str(), ios::binary);
-  if(!m_read) {
-    cerr << "Couldn't open: " << m_device_name << endl;
-    _exit(-1);
-  }
+   m_read.open(m_device_name.c_str(), ios::binary);
+   if(!m_read) {
+      ERR() << "Couldn't open: " << m_device_name << endl;
+      _exit(-1);
+   }
       
-  while(!m_stop) {
-    while(!m_read.eof()) {
-      struct dvbhdhomerun_control_mesg mesg;
+   while(!m_stop) {
+      while(!m_read.eof()) {
+         struct dvbhdhomerun_control_mesg mesg;
       
-      m_read.read( (char*)&mesg, sizeof(dvbhdhomerun_control_mesg));
-      if(m_read.fail() && !m_read.eof()) {
-	cerr << "Error FAIL reading data from " << m_device_name << endl;
-      }
-      if(m_read.bad()) {
-	cerr << "Error BAD reading data from " << m_device_name << endl;
-      }
+         m_read.read( (char*)&mesg, sizeof(dvbhdhomerun_control_mesg));
+         if(m_read.fail() && !m_read.eof()) {
+            ERR() << "Error FAIL reading data from " << m_device_name << endl;
+         }
+         if(m_read.bad()) {
+            ERR() << "Error BAD reading data from " << m_device_name << endl;
+         }
       
-      if(m_read.gcount() > 0) {
-	//cout << "Read " << m_read.gcount() << " bytes, expected " << sizeof(dvbhdhomerun_control_mesg) << endl;
-	if(m_read.gcount() < sizeof(dvbhdhomerun_control_mesg)) {
-	  cerr << "FAIL! We didn't receive enough bytes from the device driver!" << endl;
-	  _exit(-1);
-	}
+         if(m_read.gcount() > 0) {
+            //LOG() << "Read " << m_read.gcount() << " bytes, expected " << sizeof(dvbhdhomerun_control_mesg) << endl;
+            if(m_read.gcount() < sizeof(dvbhdhomerun_control_mesg)) {
+               ERR() << "FAIL! We didn't receive enough bytes from the device driver!" << endl;
+               _exit(-1);
+            }
 	
-	m_messages.push(mesg);
+            m_messages.push(mesg);
+         }
+      }      
+    
+      if(m_messages.size() > 0) {
+         this->ProcessMessages();
       }
-    }      
     
-    if(m_messages.size() > 0) {
-      this->ProcessMessages();
-    }
-    
-    m_read.clear();
+      m_read.clear();
 
-    //this->sleep(1);
-    usleep(10000);
-  }
+      //this->sleep(1);
+      usleep(10000);
+   }
 
-  m_read.close();
+   m_read.close();
 }
 
 
@@ -97,10 +98,10 @@ void Control::WriteToDevice(const struct dvbhdhomerun_control_mesg& _mesg)
 {
   m_write.write( (char*)&_mesg, sizeof(dvbhdhomerun_control_mesg));
   if(m_write.fail() && !m_write.eof()) {
-    cerr << "Error FAIL writing data to " << m_device_name << endl;
+    ERR() << "Error FAIL writing data to " << m_device_name << endl;
   }
   if(m_write.bad()) {
-    cerr << "Error BAD writing data to " << m_device_name << endl;
+    ERR() << "Error BAD writing data to " << m_device_name << endl;
   }
   
   m_write.flush();
@@ -111,7 +112,7 @@ bool Control::Ioctl(int _numOfTuners, const std::string& _name, int& _id, int _t
 {
   m_fdIoctl = open(m_device_name.c_str(), O_RDONLY);
   if(!m_fdIoctl) {
-    cerr << "Couldn't open: " << m_device_name << " for IOCTL" << endl;
+    ERR() << "Couldn't open: " << m_device_name << " for IOCTL" << endl;
     _exit(-1);
   }
 
@@ -122,11 +123,11 @@ bool Control::Ioctl(int _numOfTuners, const std::string& _name, int& _id, int _t
   tuner_data.type = _type;
   int ret = ioctl(m_fdIoctl, HDHOMERUN_REGISTER_TUNER, &tuner_data);
   if(ret != 0) {
-    cerr << "Couldn't create tuner! ioctl failed" << endl;
+    ERR() << "Couldn't create tuner! ioctl failed. This means the kernel module is either not loaded or has malfunctioned. Check dmesg." << endl;
     return false;
   }
   else {
-    cout << "Registered tuner, id from kernel: " << tuner_data.id << " name: " << tuner_data.name << endl;
+    LOG() << "Registered tuner, id from kernel: " << tuner_data.id << " name: " << tuner_data.name << endl;
   }  
   _id = tuner_data.id;
 
@@ -136,7 +137,7 @@ bool Control::Ioctl(int _numOfTuners, const std::string& _name, int& _id, int _t
 
 void Control::ProcessMessages()
 {
-  //cout << "Processing " << m_messages.size() << " messages." << endl;
+  //LOG() << "Processing " << m_messages.size() << " messages." << endl;
 
   while(!m_messages.empty()) {
     struct dvbhdhomerun_control_mesg mesg = m_messages.front();
@@ -168,7 +169,7 @@ void Control::ProcessMessages()
     }
 
     default:
-      cerr << "Unknown message from device driver! " << mesg.type << endl;
+      ERR() << "Unknown message from device driver! " << mesg.type << endl;
       break;
     }
 
@@ -196,7 +197,7 @@ void Control::FE_SET_Frontend(const struct dvbhdhomerun_control_mesg& _mesg)
 
 void Control::FE_READ_Status(struct dvbhdhomerun_control_mesg& _mesg)
 {
-  cout << "FE_READ_STATUS" << endl;
+  LOG() << "FE_READ_STATUS" << endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
   fe_status_t status = (fe_status_t)tuner->ReadStatus();
@@ -208,7 +209,7 @@ void Control::FE_READ_Status(struct dvbhdhomerun_control_mesg& _mesg)
 
 void Control::FE_READ_SIGNAL_Strength(struct dvbhdhomerun_control_mesg& _mesg)
 {
-  cout << "FE_READ_SIGNAL_STRENGTH" << endl;
+  LOG() << "FE_READ_SIGNAL_STRENGTH" << endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
   uint16_t strength = tuner->ReadSignalStrength();
@@ -242,7 +243,7 @@ void Control::StartFeed(const struct dvbhdhomerun_control_mesg& _mesg)
 {
   struct hdhomerun_dvb_demux_feed feed = _mesg.u.demux_feed;
 
-  cout << "START FEED: Pid = " << hex << feed.pid <<  endl;
+  LOG() << "START FEED: Pid = " << hex << feed.pid <<  endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
   tuner->StartStreaming(feed.pid);
@@ -254,7 +255,7 @@ void Control::StopFeed(const struct dvbhdhomerun_control_mesg& _mesg)
 {
   struct hdhomerun_dvb_demux_feed feed = _mesg.u.demux_feed;
 
-  cout << "STOP FEED: Pid = " << hex << feed.pid <<  endl;
+  LOG() << "STOP FEED: Pid = " << hex << feed.pid <<  endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
   tuner->StopStreaming(feed.pid);

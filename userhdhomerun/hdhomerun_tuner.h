@@ -31,76 +31,82 @@
 
 class HdhomerunTuner : public ThreadPthread
 {
- public:
-  enum Type 
-  {
-    NOT_SET,
-    DVBC,
-    DVBT,
-    ATSC
-  };
+public:
+   enum Type 
+      {
+         NOT_SET,
+         DVBC,
+         DVBT,
+         ATSC
+      };
 
- public:
-  HdhomerunTuner(int _device_id, int _device_ip, int _tuner);
-  ~HdhomerunTuner();
+public:
+   HdhomerunTuner(int _device_id, int _device_ip, int _tuner);
+   ~HdhomerunTuner();
   
-  void run();
+   void run();
 
-  int Tune(int _freq);
+   int Tune(int _freq);
 
-  int ReadStatus();
+   int ReadStatus();
 
-  int ReadSignalStrength();
+   int ReadSignalStrength();
 
-  int SetPesFilter(int _pid, int _output, int _pes_type);
+   int SetPesFilter(int _pid, int _output, int _pes_type);
 
-  void StartStreaming(int _pid);
-  void StopStreaming(int _pid);
+   void StartStreaming(int _pid);
+   void StopStreaming(int _pid);
 
-  const std::string& GetName();
+   const std::string& GetName();
 
-  void SetDataDeviceName(const std::string& _name);
+   void SetDataDeviceName(const std::string& _name);
 
-  void SetKernelId(int _id) {
-    m_kernelId = _id;
-  }
-  int GetKernelId() {
-    return m_kernelId;
-  }
+   void SetKernelId(int _id) {
+      m_kernelId = _id;
+   }
+   int GetKernelId() {
+      return m_kernelId;
+   }
 
-  Type GetType() {
-    return m_type;
-  }
+   Type GetType() {
+      return m_type;
+   }
 
- private:
-  void AddPidToFilter(int _pid);
-  void RemovePidFromFilter(int _pid);
-  std::string GetStrFromPidFilter();
+private:
+   void AddPidToFilter(int _pid);
+   void RemovePidFromFilter(int _pid);
+   std::string GetStrFromPidFilter();
 
- private:
-  struct hdhomerun_device_t* m_device;
+   void LogNetworkStat() const;
 
-  bool m_stream;
+private:
+   struct hdhomerun_device_t* m_device;
+
+   bool m_stream;
   
-  std::string m_pes_filter;
+   std::string m_pes_filter;
 
-  std::vector<int> m_pidFilters;
+   std::vector<int> m_pidFilters;
 
-  int m_prevFreq;
+   int m_prevFreq;
 
-  int m_deviceId;
-  int m_deviceIP;
-  int m_tuner;
+   int m_deviceId;
+   int m_deviceIP;
+   int m_tuner;
 
-  int m_kernelId;
+   int m_kernelId;
 
-  Type m_type;
+   Type m_type;
 
-  // Name returned from hdhomerun lib
-  std::string m_name;
+   // Name returned from hdhomerun lib
+   std::string m_name;
   
-  // /dev/hdhomerun_dataX device
-  std::string m_nameDataDevice;
+   // /dev/hdhomerun_dataX device
+   std::string m_nameDataDevice;
+
+   // For network statistic. Is UDP packets dropped?
+   struct hdhomerun_video_stats_t m_stats_old;
+   struct hdhomerun_video_stats_t m_stats_cur;
 };
 
 #endif // _hdhomerun_tuner_h_

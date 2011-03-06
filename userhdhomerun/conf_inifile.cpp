@@ -17,31 +17,31 @@ bool ConfIniFile::OpenIniFile(const string& _filename)
     string section;
     while(getline(conffile, line)) {
       if(line.empty()) {
-	//cout << " ignore, empty";
+         //LOG() << " ignore, empty";
       } 
       else if(strchr(line.c_str(), '#') != NULL) {
-	//cout << " ignore, comment";
+         //LOG() << " ignore, comment";
       }
       else if(strchr(line.c_str(), '[') != NULL) {
-	section = line.substr(1, line.size() - 2);
-	//cout << " section: " << section;
+         section = line.substr(1, line.size() - 2);
+         //LOG() << " section: " << section;
       }
       else if(strchr(line.c_str(), '=') != NULL) {
-	string key;
-	string value;
-	istringstream str(line);
-	getline(str, key, '=');
-	getline(str, value);
-	//cout << "key:" << key << " value:" << value << " ";
-	m_sectionKeyValue.insert( make_pair(section, map<string, string>()) );
-	m_sectionKeyValue[section].insert( make_pair(key, value));
+         string key;
+         string value;
+         istringstream str(line);
+         getline(str, key, '=');
+         getline(str, value);
+         //LOG() << "key:" << key << " value:" << value << " ";
+         m_sectionKeyValue.insert( make_pair(section, map<string, string>()) );
+         m_sectionKeyValue[section].insert( make_pair(key, value));
       }
       else {
-	//cout << " ignore, unknown";
+         //LOG() << " ignore, unknown";
       }
-
-      //cout << line << ":" << line.size();
-      //cout << endl;
+      
+      //LOG() << line << ":" << line.size();
+      //LOG() << endl;
     }
 
     return true;
@@ -51,19 +51,19 @@ bool ConfIniFile::OpenIniFile(const string& _filename)
 }
 
 bool ConfIniFile::GetSecValue(const std::string& _section, const std::string& _key,
-			      std::string& _value)
+                              std::string& _value)
 {
-  mapSecKeyVal::iterator it = m_sectionKeyValue.find(_section);
+   mapSecKeyVal::iterator it = m_sectionKeyValue.find(_section);
 
-  if( it != m_sectionKeyValue.end() ) {
-    mapKeyVal::iterator keyValIt = it->second.find(_key);
+   if( it != m_sectionKeyValue.end() ) {
+      mapKeyVal::iterator keyValIt = it->second.find(_key);
 
-    if( keyValIt != it->second.end() ) {
-      _value = keyValIt->second;
-      return true;
-    }
-  }
-
-  return false;
+      if( keyValIt != it->second.end() ) {
+         _value = keyValIt->second;
+         return true;
+      }
+   }
+   
+   return false;
 }
 

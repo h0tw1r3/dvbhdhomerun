@@ -1,0 +1,23 @@
+# HDHomeRun DVB Driver
+#
+# The userspace daemon that talks with the SiliconDust HDHomeRun.
+
+description     "HDHomeRun DVB Driver Userspace Daemon"
+author          "Villy Thomsen <tfylliv@gmail.com>"
+
+start on (filesystem and net-device-up and started udev)
+stop on starting shutdown
+
+expect fork
+
+pre-start exec modprobe dvb_hdhomerun
+
+script
+    exec /bin/userhdhomerun -f > /var/log/dvbhdhomerun_stdout.log 2> /var/log/dvbhdhomerun_stderr.log
+end script
+
+emits dvbhdhomerun
+
+post-start script
+    initctl emit dvbhdhomerun
+end script

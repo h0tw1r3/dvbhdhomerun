@@ -3,11 +3,15 @@
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
-# Name of the source package
-psource:=dvbhdhomerun-source
+NAME = $(shell grep "^Source: " debian/control|head -n 1|sed 's/Source: \(.*\)/\1/g')
+VERSION = $(shell grep "^$(NAME) " debian/changelog|head -n 1|sed 's/.*(\(.*\)).*/\1/g')
 
-# The short upstream name, used for the module source directory
-sname:=dvbhdhomerun
+# For dkms
+SRC=$(CURDIR)/debian/$(NAME)-dkms/usr/src
+
+# For module assistant
+NAME_MODASS:=dvbhdhomerun-source
+
 
 build:
 	dh_testdir
@@ -18,7 +22,7 @@ clean:
 	dh_testroot
 	dh_clean
 
-	#$(MAKE) -C kernel clean
+#	$(MAKE) -C kernel clean
 	$(MAKE) -C userhdhomerun clean
 
 
@@ -28,21 +32,32 @@ install: build
 	dh_prep
 	dh_installdirs
 	dh_installdirs -a usr/share/modass/overrides
+	dh_dkms
 
-	# Add here commands to install the package into debian/dvbhdhomerun-utils.
+	# User Space Application
 	$(MAKE) -C userhdhomerun PREFIX=$(CURDIR)/debian/dvbhdhomerun-utils install
 
+	# DKMS package.
+	install -d "$(SRC)/$(NAME)-$(VERSION)"
+	cp -a kernel/*.c "$(SRC)/$(NAME)-$(VERSION)"	
+	cp -a kernel/*.h "$(SRC)/$(NAME)-$(VERSION)"	
+	cp -a kernel/Makefile "$(SRC)/$(NAME)-$(VERSION)"	
+	chmod 644 -R "$(SRC)/$(NAME)-$(VERSION)"
+
+	# Module assistant
 	# Create the directories to install the source into
-	dh_installdirs -p$(psource)  usr/src/modules/$(sname)/debian
+	dh_installdirs -p$(NAME_MODASS)  usr/src/modules/$(NAME)/debian
 
 	# Copy only the driver source to the proper location
-	cp kernel/*  debian/$(psource)/usr/src/modules/$(sname)
+	cp kernel/*.h  debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
+	cp kernel/*.c  debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
+	cp kernel/Makefile debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
 	# Copy the needed debian/ pieces to the proper location
 	cp debian/*modules.in* \
-		debian/$(psource)/usr/src/modules/$(sname)/debian
+		debian/$(NAME_MODASS)/usr/src/modules/$(NAME)/debian
 	cp debian/rules debian/changelog debian/copyright \
-		debian/compat debian/$(psource)/usr/src/modules/$(sname)/debian/
-	cd debian/$(psource)/usr/src && tar c modules | bzip2 -9 > $(sname).tar.bz2 && rm -rf modules
+		debian/compat debian/$(NAME_MODASS)/usr/src/modules/$(NAME)/debian/
+	cd debian/$(NAME_MODASS)/usr/src && tar c modules | bzip2 -9 > $(NAME).tar.bz2 && rm -rf modules
 
 	ln -s ../packages/default.sh debian/dvbhdhomerun-utils/usr/share/modass/overrides/dvbhdhomerun-source
 
@@ -56,6 +71,10 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs changelog.txt
+	dh_installlogrotate
+	dh_installudev --priority=59
+#	dh_installinit --upstart-only --no-start
+	dh_installinit --upstart-only
 	dh_installdocs
 	dh_link
 	dh_strip
@@ -84,8 +103,8 @@ binary-modules: kdist_config
 	dh_clean -k
 # build and install the module
 	$(MAKE) KVERS=$(KVERS) LINUXSRC=$(KSRC) MODPREFIX=$(CURDIR)/debian/$(PKGNAME)/ install
-	dh_installdocs 
 	dh_installchangelogs
+	dh_installdocs
 	dh_compress
 	dh_fixperms
 	dh_installmodules

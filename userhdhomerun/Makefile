@@ -12,8 +12,6 @@ ifneq ($(PREFIX),)
 CMAKETWEAKS += -DCMAKE_INSTALL_PREFIX="$(PREFIX)"
 endif
 
-CMAKETWEAKS += -DCMAKE_BUILD_TYPE=DEBUG
-
 default_target: all
 
 build/Makefile:

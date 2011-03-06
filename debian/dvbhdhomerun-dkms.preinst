@@ -1,0 +1,10 @@
+#! /bin/bash
+# Just a quick hack to get rid of userhdhomerun and unload the old kernel modules
+
+echo "Stopping userhdhomerun and rmmod old kernel modules"
+sudo killall userhdhomerun
+sudo rmmod dvb_hdhomerun
+sudo rmmod dvb_hdhomerun_fe
+sudo rmmod dvb_hdhomerun_core
+
+exit 0

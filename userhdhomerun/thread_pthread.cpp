@@ -32,12 +32,7 @@ void ThreadPthread::stop()
   }
 }
 
-bool ThreadPthread::running()
-{
-  return m_running;
-}
-
-bool ThreadPthread::isFinished()
+bool ThreadPthread::isFinished() const
 {
   return !m_running;
 }

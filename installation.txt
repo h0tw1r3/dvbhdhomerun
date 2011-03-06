@@ -1,23 +1,40 @@
+#
 # Install dvbhomerun packages from Launchpad
+#
 sudo add-apt-repository ppa:tfylliv/dvbhdhomerun 
 sudo apt-get update 
-sudo apt-get install dvbhdhomerun-source dvbhdhomerun-utils
+sudo apt-get install dvbhdhomerun-dkms dvbhdhomerun-utils
 
-
-# Build + install kernel module automagically
-sudo module-assistant prepare
-sudo module-assistant update
-sudo module-assistant auto-install dvbhdhomerun-source
-
-
-# run it.
-sudo modprobe dvb_hdhomerun
-sudo userhdhomerun
-# Leave the userhdhomerun running in a prompt, start a new one for the rest.
+#
+# Run it.
+#
+# This starts userhdhomerun as a daemon, and will automatically
+# load the kernel module
+sudo service dvbhdhomerun-utils start
 
 
 
+#
+# Verify that service is running and kernel module is ok.
+#
+dmesg 
+
+# Should end up saying:
+# "HDHomeRun: Waiting for userspace to connect"
+
+# tail -f /var/log/dvbhdhomerun.log
+# Shoud end up saying
+#
+# "Num of devices = 1"
+# ...
+# "Registered tuner, id from kernel: 0 name: 1210E3DC-0"
+# "Registered tuner, id from kernel: 1 name: 1210E3DC-1"
+
+
+
+#
 # Test
+#
 sudo apt-get install dvb-apps w-scan
 
 # Femon prints out the signal strength. Try from a Hdhomerun Config
@@ -26,4 +43,15 @@ femon
 
 # w_scan will scan _everything_ for channels. This takes on my machine
 # ~half an hour, the output is a list of muxes.
+# See http://sourceforge.net/apps/trac/dvbhdhomerun/wiki/Testing#w_scan
+# This is for DVB-C
 w_scan -f a -A 3 -x
+
+
+# Generally play around with:
+# http://www.linuxtv.org/wiki/index.php/Testing_your_DVB_device )
+
+# Kaffeine:
+sudo apt-get install kaffeine libxine1-all-plugins
+
+

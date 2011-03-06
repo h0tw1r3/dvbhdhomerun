@@ -1,8 +1,8 @@
 General:
 
-* Use geralds patch for DKMS building.
-
 * Check documentation for references.
+
++ Use geralds patch for DKMS building.
 
 
 Kernel Module:
@@ -15,15 +15,26 @@ Kernel Module:
 * Debug
   * Decide which functions to put under each bit pattern.
 
-* SNR ratio in femon etc. Can that be derived from the HDHomeRun?
++ CONFIG_DVB_HDHOMERUN_DVB, why does that not have effect??? Compiler bug it
+  seems.
 
 
 UserHDHomerun:
 
-* Add locking of tuner.
+* Add locking of tuner?
 
-* Run as a daemon via init.d.
+* Timestamp in log.
 
++ Run as a daemon via init.d. And/or upstart. http://www.silicondust.com/forum/viewtopic.php?t=9153&postdays=0&postorder=asc&start=75
+  + Upstart script so we can run as a daemon.
+  * Test startup with tvheadend.
 
-Bugs:
++ udev rule /lib/udev/rules.d/
+
++ ""Couldn't create tuner! ioctl failed" => Check for kernel module?
+
++ Log network errors.
+
++ Log to syslog and/or logfile.
+  + rotate log file.
 

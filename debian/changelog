@@ -1,3 +1,26 @@
+dvbhdhomerun (0.0.9-1) lucid; urgency=low
+
+  * Version 0.0.9
+  * Userhdhomerun:
+    * Create log file at /var/log/dvbhdhomerun.log when run as daemon.
+    * Use upstart for running as a service/daemon.
+    * Check for network problems, log after recording.
+    * Cmd line options help text on -?.
+
+  * Ubuntu package changes:
+    * Kernel module now DKMS. Automatic build + rebuild on new kernels.
+    * Log rotate /var/log/dvbhdhomerun.log
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 06 mar 2011 20:00:00 +0100
+
+dvbhdhomerun (0.0.8-1) lucid; urgency=low
+
+  * Daemonize userhdhomerun, so we can run it as a daemon.
+  * Added cmd line options to userhdhomerun -f, -u, -g.
+  * Install udev rules from deb package.
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Fri, 31 Dec 2010 15:00:00 +0100
+
 dvbhdhomerun (0.0.7-1) lucid; urgency=low
 
   * Version 0.0.7
@@ -8,7 +31,7 @@ dvbhdhomerun (0.0.7-1) lucid; urgency=low
 dvbhdhomerun (0.0.6-1) lucid; urgency=low
 
   * Version 0.0.6
-  * /etc/dvbhdhomerun conf file. Choose tuner type
+  * /etc/dvbhdhomerun conf file. Choose tuner type ATSC/DVB-C/DVB-T
   * DVB-T added
 
  -- Villy Thomsen <tfylliv@gmail.com>  Wed, 08 Dec 2010 21:00:41 +0100
@@ -16,6 +39,11 @@ dvbhdhomerun (0.0.6-1) lucid; urgency=low
 dvbhdhomerun (0.0.2-2) lucid; urgency=low
 
   * Build for lucid in launchpad.
+  * Compile under Ubuntu 10.10. Kfifo interface change in kernel 2.6.33.
+  * ATSC reported ok by testers.
+  * Removed dependency on QT, now use pthreads.
+  * Fixed all "leaks" reported by valgrind.
+  * Catch ctrl-c and close down threads nicely on exit in userhdhomerun.
 
  -- Villy Thomsen <tfylliv@gmail.com>  Sun, 07 Nov 2010 18:23:41 +0100
 
@@ -24,7 +52,6 @@ dvbhdhomerun (0.0.2-1) maverick; urgency=low
   * Version 0.0.2
   * Ubuntu/Debian packages now possible.
   * Default debug level = nothing.
-	
 
  -- Villy Thomsen <tfylliv@gmail.com>  Sun, 17 Oct 2010 16:51:49 +0200
 

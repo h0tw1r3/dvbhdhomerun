@@ -23,6 +23,7 @@
 
 #include "hdhomerun_control.h"
 #include "hdhomerun_tuner.h"
+#include "log_file.h"
 
 #include <iostream>
 #include <sstream>
@@ -38,10 +39,10 @@ HdhomerunController::HdhomerunController(int _maxDevices)
   struct hdhomerun_discover_device_t devices[m_maxDevices];
 
   int numOfDevices = hdhomerun_discover_find_devices_custom(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, devices, m_maxDevices);
-  cout << "Num of devices = " << numOfDevices << endl;
+  LOG() << "Num of devices = " << numOfDevices << endl;
 
   if(numOfDevices == 0) {
-    cerr << "No HDHomeRun devices found! Exiting" << endl;
+    ERR() << "No HDHomeRun devices found! Exiting" << endl;
     _exit(-1);
   }
 
@@ -56,7 +57,7 @@ HdhomerunController::HdhomerunController(int _maxDevices)
     }
   }
 
-  cout << endl;
+  LOG() << endl;
 
   //
   // Create DVB devices 

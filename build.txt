@@ -22,7 +22,7 @@ Libhdhomerun:
 
 Normally just install the library: 
 
-	 sudo apt-get install libhdhomerun-dev
+  sudo apt-get install libhdhomerun-dev
 
 If you need to build it yourself:
 
@@ -42,7 +42,7 @@ Userhdhomerun:
 -------------
 
 sudo apt-get install cmake g++
-     (libraries/tools needed to compile the below)
+    (libraries/tools needed to compile the below)
 
 cd $SRC/userhdhomerun
 
@@ -70,7 +70,7 @@ then they are not needed.
 You need preform these three steps once before modprobe'ing the kernel
 module and/or running the application:
 
-1) sudo cp $SRC/kernel/61-hdhomerun.rules /etc/udev/rules.d/.
+1) sudo cp $SRC/debian/dvbhdhomerun-utils.udev /etc/udev/rules.d/.
    (this makes the /dev/hdhomerun_xyz devices part of the "video"
    group.)
 

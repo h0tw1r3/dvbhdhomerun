@@ -14,6 +14,7 @@ SET(userhdhomerun_HDRS
   hdhomerun_control.h
   hdhomerun_controller.h
   hdhomerun_tuner.h
+  log_file.h
   thread_pthread.h
 )
 
@@ -22,6 +23,7 @@ SET(userhdhomerun_SRCS
   hdhomerun_control.cpp
   hdhomerun_controller.cpp
   hdhomerun_tuner.cpp
+  log_file.cpp
   thread_pthread.cpp
 )
 
@@ -39,6 +41,9 @@ TARGET_LINK_LIBRARIES(userhdhomerun
 	hdhomerun
 )
 
+ADD_CUSTOM_TARGET(cppcheck
+  COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} \; cppcheck --enable=all main.cpp ${userhdhomerun_SRCS}
+)
 
 INSTALL(TARGETS userhdhomerun
   RUNTIME DESTINATION bin

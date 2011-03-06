@@ -24,6 +24,8 @@
 
 #include <linux/dvb/frontend.h>
 
+#define CONFIG_DVB_HDHOMERUN_FE 1  // Need to got when/if included in linuxtv.org
+
 #if defined(CONFIG_DVB_HDHOMERUN_FE) && defined(MODULE)
 extern struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbc(int id);
 extern struct dvb_frontend *dvb_hdhomerun_fe_attach_dvbt(int id);

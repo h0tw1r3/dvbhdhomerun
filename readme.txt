@@ -34,7 +34,7 @@ streams and signal quality requests.
 
 The kernel driver creates /dev/dvb/adapterX/xyz devices via the linux
 DVB subsystem (http://linuxtv.org). One adapter per tuner is created,
-a dual tuner HDHomeRun will thus create two adapters).
+a dual tuner HDHomeRun will thus create two adapters.
 
 The kernel driver also creates the following devices:
 
@@ -42,7 +42,7 @@ The kernel driver also creates the following devices:
 in order to receive requests forwarded from the kernel driver from dvb
 applications).
 
-2) One or more /dev/hdhomerun_dataX device(s) (one device per adapter.
+2) One or more /dev/hdhomerun_dataX device(s) one device per adapter.
 The userhdhomerun connects to these to feed the MPEG transport
 stream(s) from the HDHomeRun to the kernel driver. The kernel driver
 then sends the MPEG transport stream to the DVB subsystem.
@@ -51,7 +51,7 @@ then sends the MPEG transport stream to the DVB subsystem.
 See build.txt for instructions of how to build kernel driver + user
 app.
 
-See use.txt for usage instructions.
+See installation.txt for usage/installation instructions.
 
 
 
