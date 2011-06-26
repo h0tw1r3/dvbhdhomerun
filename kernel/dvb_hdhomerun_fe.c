@@ -178,8 +178,15 @@ static enum dvbfe_algo dvb_hdhomerun_fe_get_frontend_algo(struct dvb_frontend *f
 #endif
 }
 
+#ifdef S2_LIPLIANIN
+static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_parameters *params)
+{
+	DEBUG_FUNC(1);
 
-static int  dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_parameters *params,
+	return dvb_hdhomerun_fe_set_frontend(fe, params);
+}
+#else
+static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_parameters *params,
 					unsigned int mode_flags, unsigned int *delay, fe_status_t *status)
 {
 	DEBUG_FUNC(1);
@@ -195,7 +202,7 @@ static int  dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_p
 
 	return dvb_hdhomerun_fe_read_status(fe, status);
 }
-
+#endif // S2_LIPLIANIN
 
 
 /* Setup/Init functions */

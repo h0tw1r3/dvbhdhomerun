@@ -39,6 +39,7 @@ LINK_DIRECTORIES(
 ADD_EXECUTABLE(userhdhomerun main.cpp ${userhdhomerun_SRCS})
 TARGET_LINK_LIBRARIES(userhdhomerun
 	hdhomerun
+	pthread
 )
 
 ADD_CUSTOM_TARGET(cppcheck
