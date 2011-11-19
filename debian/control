@@ -14,6 +14,11 @@ Description: User space application that talks with the HDHomeRun.
  get requests from DVB applications. Feeds those requests to the
  HDHomeRun via SiliconDusts open source library.
 
+Package: dvbhdhomerun-utils-dbg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, dvbhdhomerun-utils
+Description: Debug symbols for the userhdhomerun application.
+
 Package: dvbhdhomerun-source
 Architecture: all
 Depends: module-assistant, build-essential, debhelper (>= 7), make, bzip2, linux-headers-generic | linux-headers
