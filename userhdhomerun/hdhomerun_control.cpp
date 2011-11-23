@@ -189,7 +189,12 @@ void Control::FE_SET_Frontend(const struct dvbhdhomerun_control_mesg& _mesg)
   
   // Need to send stuff to HDHOMERUN
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
-  int ret = tuner->Tune(frontend_param.frequency);
+  if(tuner) {
+     int ret = tuner->Tune(frontend_param.frequency);
+  }
+  else {
+     ERR() << "Tuner id does not exist!" << _mesg.id << endl;
+  }
 
   this->WriteToDevice(_mesg);
 }
@@ -200,10 +205,15 @@ void Control::FE_READ_Status(struct dvbhdhomerun_control_mesg& _mesg)
   LOG() << "FE_READ_STATUS" << endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
-  fe_status_t status = (fe_status_t)tuner->ReadStatus();
+  if(tuner) {
+     fe_status_t status = (fe_status_t)tuner->ReadStatus();
   
-  _mesg.u.fe_status = status;
-
+     _mesg.u.fe_status = status;
+  }
+  else {
+     ERR() << "Tuner id does not exist!" << _mesg.id << endl;
+  }
+  
   this->WriteToDevice(_mesg);
 }
 
@@ -212,9 +222,14 @@ void Control::FE_READ_SIGNAL_Strength(struct dvbhdhomerun_control_mesg& _mesg)
   LOG() << "FE_READ_SIGNAL_STRENGTH" << endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
-  uint16_t strength = tuner->ReadSignalStrength();
+  if(tuner) {
+     uint16_t strength = tuner->ReadSignalStrength();
   
-  _mesg.u.signal_strength = strength;
+     _mesg.u.signal_strength = strength;
+  }
+  else {
+     ERR() << "Tuner id does not exist!" << _mesg.id << endl;
+  }
 
   this->WriteToDevice(_mesg);
 }
@@ -234,8 +249,13 @@ void Control::DMX_SET_PES_Filter(const struct dvbhdhomerun_control_mesg& _mesg)
   // flags 1 = DMX_CHECK_CRC, 2 = DMX_ONESHOT, 4 = DMX_IMMEDIATE_START
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
-  tuner->SetPesFilter(pes_filter.pid, pes_filter.output, pes_filter.pes_type);
-  
+  if(tuner) {
+     tuner->SetPesFilter(pes_filter.pid, pes_filter.output, pes_filter.pes_type);
+  }
+  else {
+     ERR() << "Tuner id does not exist!" << _mesg.id << endl;
+  }
+
   this->WriteToDevice(_mesg);
 }
 
@@ -246,7 +266,12 @@ void Control::StartFeed(const struct dvbhdhomerun_control_mesg& _mesg)
   LOG() << "START FEED: Pid = " << hex << feed.pid <<  endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
-  tuner->StartStreaming(feed.pid);
+  if(tuner) {
+     tuner->StartStreaming(feed.pid);
+  }
+  else {
+     ERR() << "Tuner id does not exist!" << _mesg.id << endl;
+  }
 
   this->WriteToDevice(_mesg);
 }
@@ -258,7 +283,12 @@ void Control::StopFeed(const struct dvbhdhomerun_control_mesg& _mesg)
   LOG() << "STOP FEED: Pid = " << hex << feed.pid <<  endl;
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
-  tuner->StopStreaming(feed.pid);
+  if(tuner) {
+     tuner->StopStreaming(feed.pid);
+  }
+  else {
+     ERR() << "Tuner id does not exist!" << _mesg.id << endl;
+  }
 
   this->WriteToDevice(_mesg);
 }
