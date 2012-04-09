@@ -151,7 +151,16 @@ int main(int argc, char** argv)
       // }
    }
    else {
-      logFile.SetLogType(LogFile::COUT);
+      if(logFileName.empty()) {
+         logFile.SetLogType(LogFile::COUT);
+      }
+      else {
+         if(!logFile.SetAndOpenLogFile(logFileName)) {
+            cerr << "Couldn't open log file: " << logFileName << endl;
+            exit(2);
+         }
+         logFile.SetLogType(LogFile::FILE);
+      }
    }
 
    // 

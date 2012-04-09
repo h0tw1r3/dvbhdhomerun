@@ -45,8 +45,10 @@ void LogFile::SetLogType(LogFile::LogType _type)
 
 bool LogFile::SetAndOpenLogFile(const std::string& _fileName)
 {
+   m_logFileName = _fileName;
+
    bool ret = false;
-   m_logFile.open(_fileName.c_str(), ios::out | ios::app);
+   m_logFile.open(m_logFileName.c_str(), ios::out | ios::app);
    if(m_logFile.is_open())
    {
       ret = true;
@@ -66,15 +68,26 @@ int LogFile::overflow(int _i)
       }
 
       if (m_logTo & LogFile::FILE) {
-         if(m_logFile.is_open()) {
+         // Logrotate moves files at xx:yy (unlink actually).
+         // bad(), is_fail() on so forth can't detect that,
+         // So we need to open/close on each write.
+         // (or use inotify, but that is another story).
+         m_logFile.open(m_logFileName.c_str(), ios::out | ios::app);
+         if(m_logFile.is_open())
+         {
             m_logFile.write(m_buffer.c_str(), m_buffer.size());
             m_logFile.flush();
+            m_logFile.close();
+         }
+         else
+         {
+            cerr << "Can't reopen log file!! " << m_logFileName << endl;
          }
       }
-      
+
       m_buffer.clear();
    }
-
+   
    return _i;
 }
 
