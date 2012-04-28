@@ -5,7 +5,7 @@
 description     "HDHomeRun DVB Driver Userspace Daemon"
 author          "Villy Thomsen <tfylliv@gmail.com>"
 
-start on (filesystem and net-device-up and started udev)
+start on (filesystem and net-device-up IFACE!=lo and started udev)
 stop on starting shutdown
 
 expect fork
@@ -17,6 +17,9 @@ script
 end script
 
 emits dvbhdhomerun
+
+respawn
+respawn limit 2 3600
 
 post-start script
     initctl emit dvbhdhomerun

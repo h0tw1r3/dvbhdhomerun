@@ -108,7 +108,7 @@ void Control::WriteToDevice(const struct dvbhdhomerun_control_mesg& _mesg)
 }
 
 
-bool Control::Ioctl(int _numOfTuners, const std::string& _name, int& _id, int _type) 
+bool Control::Ioctl(int _numOfTuners, const std::string& _name, int& _id, int _type, bool _useFullName) 
 {
   m_fdIoctl = open(m_device_name.c_str(), O_RDONLY);
   if(!m_fdIoctl) {
@@ -118,9 +118,10 @@ bool Control::Ioctl(int _numOfTuners, const std::string& _name, int& _id, int _t
 
   struct hdhomerun_register_tuner_data tuner_data;
   tuner_data.num_of_devices = _numOfTuners;
-  strncpy(tuner_data.name, _name.c_str(), 11);
-  tuner_data.name[10] = 0;
+  strncpy(tuner_data.name, _name.c_str(), sizeof(tuner_data.name) );
+  tuner_data.name[ sizeof(tuner_data.name) - 1 ] = '\0';
   tuner_data.type = _type;
+  tuner_data.use_full_name = _useFullName;
   int ret = ioctl(m_fdIoctl, HDHOMERUN_REGISTER_TUNER, &tuner_data);
   if(ret != 0) {
     ERR() << "Couldn't create tuner! ioctl failed. This means the kernel module is either not loaded or has malfunctioned. Check dmesg." << endl;

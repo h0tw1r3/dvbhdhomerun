@@ -1,3 +1,23 @@
+dvbhdhomerun (0.0.10-1) lucid; urgency=low
+
+  * Version 0.0.10
+  * Userhdhomerun:
+    * Check for existence of tuner_count in libhdhomerun.
+    * Make sure logrotate of /var/log/dvbhdhomerun.log is handled, 
+      e.g. open a new file when logrotate takes place (ticket 5).
+    * Log explicitly when DVB-C is used when autodetecting.
+    * Each tuner can be disabled (in /etc/dvbhdhomerun).
+
+  * Kernel:
+    * Use HDHomeRun ID in device name (if configured in /etc/dvbhdhomerun).
+
+  * Ubuntu package changes:
+    * Upstart: Allow respawn twice within 3600 seconds if we crash.
+    * Upstart: Use "net-device-up IFACE!=lo", wait untill network is ready.
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 06 mar 2011 20:00:00 +0100
+
+
 dvbhdhomerun (0.0.9-2) oneiric; urgency=low
 
   * Correctly build -dbg package to save debug symbols.

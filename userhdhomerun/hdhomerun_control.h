@@ -38,7 +38,7 @@ class Control : public ThreadPthread
   
   void run();
 
-  bool Ioctl(int _numOfTuners, const std::string& _name, int& _id, int type);
+   bool Ioctl(int _numOfTuners, const std::string& _name, int& _id, int type, bool _useFullName);
 
  private:
   void ProcessMessages();

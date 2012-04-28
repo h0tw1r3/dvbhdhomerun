@@ -10,12 +10,10 @@ sudo make install
 if [ "$?" != "0" ]; then
     exit -1;
 fi
-echo 
 echo
-sudo rmmod dvb_hdhomerun
-sudo rmmod dvb_hdhomerun_fe
-sudo rmmod dvb_hdhomerun_core
-echo 
+sudo rmmod -v dvb_hdhomerun
+sudo rmmod -v dvb_hdhomerun_fe
+sudo rmmod -v dvb_hdhomerun_core
 echo
-sudo modprobe dvb_hdhomerun
+sudo modprobe -v dvb_hdhomerun
 

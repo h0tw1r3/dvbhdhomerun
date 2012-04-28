@@ -39,7 +39,8 @@ using namespace std;
 HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner) 
   : m_device(0), m_stream(false), m_prevFreq(0),
     m_deviceId(_device_id), m_deviceIP(_device_ip), m_tuner(_tuner),
-    m_kernelId(-1), m_type(HdhomerunTuner::NOT_SET)
+    m_kernelId(-1), m_useFullName(false), m_isDisabled(false),
+    m_type(HdhomerunTuner::NOT_SET)
 {
    m_device = hdhomerun_device_create(m_deviceId, m_deviceIP, m_tuner, NULL);
    
@@ -68,6 +69,22 @@ HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner)
                   << "\" based on conf file" << endl;
          }
       }
+
+      string useFullName;
+      if(conf.GetSecValue(m_name, "use_full_name", useFullName)) {
+         if(useFullName == "true") {
+            m_useFullName = true;
+            LOG() << "Using full name" << endl;
+         }
+      }
+      
+      string disable;
+      if(conf.GetSecValue(m_name, "disable", disable)) {
+         if(disable == "true") {
+            m_isDisabled = true;
+            LOG() << "Tuner disabled according to conf file" << endl;
+         }
+      }
    }
    else {
       ERR() << "No ini file found, using default values" << endl;
@@ -80,6 +97,7 @@ HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner)
          string type(tmp);
          LOG() << "Type of device: " << type << endl;
          if(type == "hdhomerun_dvbt") {
+            LOG() << "Notice, setting to DVB-C!! Use /etc/dvbhdhomerun to change that." << endl;
             m_type = HdhomerunTuner::DVBC;
          }
          else if(type == "hdhomerun_atsc") {

@@ -68,6 +68,14 @@ public:
       return m_kernelId;
    }
 
+   bool GetUseFullName() {
+      return m_useFullName;
+   }
+
+   bool IsDisabled() {
+      return m_isDisabled;
+   }
+
    Type GetType() {
       return m_type;
    }
@@ -95,6 +103,9 @@ private:
    int m_tuner;
 
    int m_kernelId;
+
+   bool m_useFullName;
+   bool m_isDisabled;
 
    Type m_type;
 

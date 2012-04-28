@@ -27,6 +27,10 @@ SET(userhdhomerun_SRCS
   thread_pthread.cpp
 )
 
+INCLUDE(CheckStructHasMember)
+CHECK_STRUCT_HAS_MEMBER("struct hdhomerun_discover_device_t" tuner_count ${LIBHDHOMERUN_PATH}/hdhomerun.h HAVE_HDHOMERUN_TUNER_COUNT)
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
 INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_BINARY_DIR} 
 	${LIBHDHOMERUN_PATH}

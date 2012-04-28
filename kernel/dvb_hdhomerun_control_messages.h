@@ -49,10 +49,11 @@ struct hdhomerun_dvb_demux_feed {
 };
 
 struct hdhomerun_register_tuner_data {
-	uint8_t num_of_devices;
-	char name[12];
-	int id;
-	int type;
+   uint8_t num_of_devices;
+   char name[12];
+   int id;
+   int type;
+   bool use_full_name;
 };
 
 struct dvbhdhomerun_control_mesg {

@@ -2,10 +2,16 @@ General:
 
 * Check documentation for references.
 
-* upstart, check sidste post fra silicondust.
+
++ upstart, check last post from silicondust.
+  + use net-device-up IFACE!=lo?
+
++ Respawn so that crashes won't hurt us:
 
 
 Kernel Module:
+
+* Kernel 3.3 borks kernel driver. Use DVBv5 (ticket 8)
 
 * Remove unneeded DVB functions.
 
@@ -15,14 +21,25 @@ Kernel Module:
 * Debug
   * Decide which functions to put under each bit pattern.
 
++ Use HDHomeRun ID in the device name.
 
 UserHDHomerun:
 
-* MAX_TUNERS=2 get rid of that, use values from struct.
+* Need to use conf file to configure number of tuners?
 
 * Use strstr on "atsc"/"cablecard" or "dvbt" to autodetect.
 
+* Timestamp in log?
+
 * Add locking of tuner?
 
-* Timestamp in log.
 
++ Patch from Paul C. Prime.
+  + MAX_TUNERS=2 get rid of that, use values from struct if available.
+
++ Log that DVB-C is used when dvbt is reported.
+
++ Can we fail writing logfiles? (ticket 5).
+
++ Disable/enable tuners in conf file. Default enable.
+  

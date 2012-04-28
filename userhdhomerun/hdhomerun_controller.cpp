@@ -21,6 +21,7 @@
 
 #include "hdhomerun_controller.h"
 
+#include "config.h"
 #include "hdhomerun_control.h"
 #include "hdhomerun_tuner.h"
 #include "log_file.h"
@@ -37,6 +38,12 @@ HdhomerunController::HdhomerunController(int _maxDevices)
   // Discover HDHomeRun's 
   //
   struct hdhomerun_discover_device_t devices[m_maxDevices];
+  
+  // 'devices' is alloc'd on stack, so zero it as a precaution.
+  // hdhomerun_discover_device_t has grown in size across versions of libhdhomerun
+  // and I don't see a way to programmatically check libhdhomerun's API version.
+  // ...really fragile API design...
+  memset(devices, 0, sizeof(devices));
 
   int numOfDevices = hdhomerun_discover_find_devices_custom(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, devices, m_maxDevices);
   LOG() << "Num of devices = " << numOfDevices << endl;
@@ -46,17 +53,48 @@ HdhomerunController::HdhomerunController(int _maxDevices)
     _exit(-1);
   }
 
+  
   //
   // Create an object for each tuner to handle data streaming/filtering/etc.
   //
+#ifdef HAVE_HDHOMERUN_TUNER_COUNT // Only newer hdhomerun's have tuner_count in struct hdhomerun_discover_device_t. First available in 20110317beta1.
+  for (int i = 0; i < numOfDevices; ++i) {
+     // sanity check, just in case there's an older version of libhdhomerun installed
+     if (hdhomerun_discover_validate_device_id(devices[i].device_id) && devices[i].tuner_count <= 10) {
+        LOG() << endl << "Device " << hex << devices[i].device_id
+              << " is type " << devices[i].device_type
+              << " and has " << (unsigned int)devices[i].tuner_count << " tuners" << endl;
+
+        for (int j = 0; j < devices[i].tuner_count; ++j) {
+           HdhomerunTuner* tuner = new HdhomerunTuner(devices[i].device_id, devices[i].ip_addr, j);
+           if(tuner->IsDisabled()) {
+              delete tuner;
+           }
+           else {
+              m_tuners.push_back(tuner);
+           }
+        }
+     } 
+     else {
+        ERR() << "Device " << hex << devices[i].device_id << " reports invalid information. Is your libhdhomerun up-to-date?" << endl;
+        _exit(-1);
+     } 
+  }
+#else
   const int MAX_TUNERS = 2; 
   for(int i = 0; i < numOfDevices; ++i) {
-    for(int j = 0; j < MAX_TUNERS; ++j) {
-      HdhomerunTuner* tuner = new HdhomerunTuner(devices[i].device_id, devices[i].ip_addr, j);
-      m_tuners.push_back(tuner);
-    }
+     for(int j = 0; j < MAX_TUNERS; ++j) {
+        HdhomerunTuner* tuner = new HdhomerunTuner(devices[i].device_id, devices[i].ip_addr, j);
+        if(tuner->IsDisabled()) {
+           delete tuner;
+        }
+        else {
+           m_tuners.push_back(tuner);
+        }
+     }
   }
-
+#endif
+  
   LOG() << endl;
 
   //
@@ -68,7 +106,7 @@ HdhomerunController::HdhomerunController(int _maxDevices)
   for(it = m_tuners.begin(); it != m_tuners.end(); ++it) {
     int kernelId = 0;
 
-    if(m_control->Ioctl(numOfDevices * MAX_TUNERS, (*it)->GetName(), kernelId, (*it)->GetType())) {
+    if(m_control->Ioctl(m_tuners.size(), (*it)->GetName(), kernelId, (*it)->GetType(), (*it)->GetUseFullName() )) {
       ostringstream stream;
       stream << "/dev/hdhomerun_data" << kernelId;
       (*it)->SetDataDeviceName(stream.str());

@@ -149,6 +149,7 @@ static int __devinit dvb_hdhomerun_register(struct dvb_hdhomerun *hdhomerun)
 	struct dvb_demux *dvbdemux;
 	struct dmx_demux *dmx;
 	int ret;
+   int len;
 
 	DEBUG_FUNC(1);
 
@@ -209,6 +210,15 @@ static int __devinit dvb_hdhomerun_register(struct dvb_hdhomerun *hdhomerun)
 	ret = (hdhomerun->fe == NULL) ? -1 : 0;
 	if (ret < 0)
 		goto err_disconnect_frontend;
+
+   if(hdhomerun->tuner_data.use_full_name) {
+      len = strlen((const char*)hdhomerun->fe->ops.info.name);
+      hdhomerun->fe->ops.info.name[len] = 32; // Insert space char
+      strncpy( &hdhomerun->fe->ops.info.name[len+1],
+               hdhomerun->tuner_data.name,
+               sizeof(hdhomerun->fe->ops.info.name) - len - 1);
+      hdhomerun->fe->ops.info.name[ sizeof(hdhomerun->fe->ops.info.name) - 1 ] = '\0';
+   }
 
 	ret = dvb_register_frontend(dvb_adapter, hdhomerun->fe);
 	if (ret < 0)
