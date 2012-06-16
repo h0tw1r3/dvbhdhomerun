@@ -22,6 +22,8 @@
 #ifndef _log_file_h
 #define _log_file_h
 
+#include <pthread.h>
+
 #include <fstream>
 #include <ostream>
 #include <string>
@@ -57,6 +59,8 @@ private:
    LogType m_logTo;
    std::string m_logFileName;
    std::ofstream m_logFile;
+
+   pthread_mutex_t m_mutexLogFile;
 };
 
 extern LogFile logFile;

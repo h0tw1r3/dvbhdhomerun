@@ -31,6 +31,12 @@ LogFile logFile;
 LogFile::LogFile()
    : ostream(this), m_logTo(LogFile::NONE)
 {
+   // Initialize the mutex
+   if(pthread_mutex_init(&m_mutexLogFile, NULL))
+   {
+      cerr << "Can't initialize mutex" << endl;
+      _exit(-1);
+   }
 }
 
 LogFile::~LogFile()
@@ -72,17 +78,18 @@ int LogFile::overflow(int _i)
          // bad(), is_fail() on so forth can't detect that,
          // So we need to open/close on each write.
          // (or use inotify, but that is another story).
+         pthread_mutex_lock(&m_mutexLogFile);
          m_logFile.open(m_logFileName.c_str(), ios::out | ios::app);
          if(m_logFile.is_open())
          {
             m_logFile.write(m_buffer.c_str(), m_buffer.size());
-            m_logFile.flush();
             m_logFile.close();
          }
          else
          {
             cerr << "Can't reopen log file!! " << m_logFileName << endl;
          }
+         pthread_mutex_unlock(&m_mutexLogFile);
       }
 
       m_buffer.clear();
