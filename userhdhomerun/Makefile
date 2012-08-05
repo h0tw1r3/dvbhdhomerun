@@ -30,3 +30,6 @@ run: all
 
 all: build/Makefile
 	$(MAKE) -C build $(MAKE_FLAGS) $@
+
+cppcheck:
+	cppcheck --enable=all -I build/ -v *.cpp

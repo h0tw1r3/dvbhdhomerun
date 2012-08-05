@@ -1,0 +1,62 @@
+--- dvbhdhomerun-vanilla/userhdhomerun/main.cpp	2012-06-26 19:57:52.000000000 +0100
++++ dvbhdhomerun-0.0.10/userhdhomerun/main.cpp	2012-06-26 20:12:30.000000000 +0100
+@@ -59,18 +59,6 @@
+ 
+ bool g_stop = false;
+ 
+-static void sigexit(int)
+-{
+-   LOG() << "Exiting" << endl;
+-   g_stop = true;
+-}
+-
+-static void handle_sigpipe(int x)
+-{
+-   return;
+-}
+-
+-
+ int main(int argc, char** argv)
+ {
+    //
+@@ -81,6 +69,13 @@
+    std::string logFileName;
+    bool forkChild = false;
+    int c;
++
++   sigset_t signal_set, read_set;
++   int sig;
++
++   sigfillset( &signal_set );
++   pthread_sigmask( SIG_BLOCK, &signal_set, NULL );
++
+    while((c = getopt(argc, argv, "u:g:fl:")) != -1)
+    {
+       switch(c)
+@@ -171,11 +166,21 @@
+    //
+    // Wait for signals to stop
+    //
+-   signal(SIGPIPE, handle_sigpipe);
+-   signal(SIGINT, sigexit);
+-   signal(SIGTERM, sigexit);
+-   while(!g_stop) {
+-      usleep(10000000);
++
++   while ( !g_stop ) {
++	sigfillset( &read_set );
++	sigwait( &read_set, &sig );
++
++	switch ( sig ) {
++	case SIGINT:
++	case SIGTERM:
++	   LOG() << "Exiting" << endl;
++	   g_stop = true;
++	   break;
++
++	default:
++	   break;
++	}
+    }
+ 
+    return 0;

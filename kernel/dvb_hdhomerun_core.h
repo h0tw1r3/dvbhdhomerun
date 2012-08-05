@@ -27,7 +27,7 @@
 
 #include "dvb_hdhomerun_control_messages.h"
 
-#define HDHOMERUN_VERSION "0.0.10"
+#define HDHOMERUN_VERSION "0.0.11"
 
 #define HDHOMERUN_MAX_TUNERS 8
 
@@ -36,6 +36,8 @@ extern struct kfifo control_fifo_kernel;
 extern int wait_for_write;
 extern int userspace_ready;
 extern wait_queue_head_t control_readq;
+extern wait_queue_head_t inq;
+extern wait_queue_head_t outq;
 extern int control_bufsize;
 extern spinlock_t control_spinlock_user;
 extern spinlock_t control_spinlock_kernel;

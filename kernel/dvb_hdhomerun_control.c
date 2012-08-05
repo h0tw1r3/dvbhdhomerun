@@ -33,6 +33,7 @@
 #include <linux/miscdevice.h>
 #include <linux/module.h>
 #include <linux/platform_device.h>
+#include <linux/poll.h>
 #include <linux/slab.h>
 #include <linux/spinlock.h>
 #include <linux/sched.h>
@@ -52,6 +53,16 @@ MODULE_DESCRIPTION("HDHomeRun Driver Core Module");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(HDHOMERUN_VERSION);
 
+static unsigned int hdhomerun_control_poll(struct file *f, struct poll_table_struct *p)
+{
+	unsigned int mask = 0;
+	poll_wait(f, &inq, p);
+	poll_wait(f, &outq, p);
+	if (my_kfifo_len(&control_fifo_user) != 0) mask |= POLLIN | POLLRDNORM; /* readable */
+	mask |= POLLOUT | POLLWRNORM; /* writable... always? */
+	return mask;
+}
+
 static ssize_t hdhomerun_control_read(struct file *f, char *buf,
 				      size_t count, loff_t *offset)
 {
@@ -67,8 +78,12 @@ static ssize_t hdhomerun_control_read(struct file *f, char *buf,
 	if (count == 0)
 		return 0;
 
-	if(my_kfifo_len(&control_fifo_user) == 0)
-		return 0;
+	while(my_kfifo_len(&control_fifo_user) <= 0) {
+		if (f->f_flags & O_NONBLOCK)
+			return -EAGAIN;
+		if (wait_event_interruptible(inq, (my_kfifo_len(&control_fifo_user) != 0) ))
+			return -ERESTARTSYS;
+	}
 
 	user_data = kmalloc(count, GFP_KERNEL);
 	if (!user_data)
@@ -107,6 +122,12 @@ static ssize_t hdhomerun_control_write(struct file *f, const char __user *buf,
 	}
 	
 	if(wait_for_write) {
+		while(my_kfifo_len(&control_fifo_kernel) == control_bufsize) {
+			if (f->f_flags & O_NONBLOCK)
+				return -EAGAIN;
+			if (wait_event_interruptible(outq, (my_kfifo_len(&control_fifo_kernel) < control_bufsize) ))
+				return -ERESTARTSYS;
+		}
 		retval = my_kfifo_put(&control_fifo_kernel, user_data, count);
 	} else {
 		DEBUG_OUT(HDHOMERUN_CONTROL, "%s ignoring write\n", __FUNCTION__);
@@ -220,6 +241,7 @@ static struct file_operations hdhomerun_control_fops = {
 	.write = hdhomerun_control_write,
 	.open = hdhomerun_control_open,
 	.release = hdhomerun_control_release,
+	.poll = hdhomerun_control_poll,
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
 	.unlocked_ioctl = hdhomerun_control_ioctl,
 #else
@@ -264,6 +286,8 @@ int dvb_hdhomerun_control_init() {
 		return PTR_ERR(&control_fifo_kernel);
 	}
 	init_waitqueue_head(&control_readq);
+	init_waitqueue_head(&inq);
+	init_waitqueue_head(&outq);
 
 error:
 	return ret;
@@ -272,7 +296,6 @@ EXPORT_SYMBOL(dvb_hdhomerun_control_init);
 
 void dvb_hdhomerun_control_exit() {
 	DEBUG_FUNC(1);
-
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)
 	kfifo_free(&control_fifo_user);
 	kfifo_free(&control_fifo_kernel);

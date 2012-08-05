@@ -30,6 +30,7 @@
 #include <sys/ioctl.h>
 
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -42,55 +43,66 @@ Control::Control(HdhomerunController* _hdhomerun)
      ERR() << "Couldn't open: " << m_device_name << endl;
     _exit(-1);
   }
+  pipe(pfd);
 }
 
 Control::~Control()
 {
   m_write.close();
+  close(pfd[0]);
 }
 
 void Control::run()
 {
-   m_read.open(m_device_name.c_str(), ios::binary);
-   if(!m_read) {
-      ERR() << "Couldn't open: " << m_device_name << endl;
-      _exit(-1);
-   }
-      
-   while(!m_stop) {
-      while(!m_read.eof()) {
-         struct dvbhdhomerun_control_mesg mesg;
-      
-         m_read.read( (char*)&mesg, sizeof(dvbhdhomerun_control_mesg));
-         if(m_read.fail() && !m_read.eof()) {
-            ERR() << "Error FAIL reading data from " << m_device_name << endl;
-         }
-         if(m_read.bad()) {
-            ERR() << "Error BAD reading data from " << m_device_name << endl;
-         }
-      
-         if(m_read.gcount() > 0) {
-            //LOG() << "Read " << m_read.gcount() << " bytes, expected " << sizeof(dvbhdhomerun_control_mesg) << endl;
-            if(m_read.gcount() < sizeof(dvbhdhomerun_control_mesg)) {
-               ERR() << "FAIL! We didn't receive enough bytes from the device driver!" << endl;
-               _exit(-1);
-            }
-	
-            m_messages.push(mesg);
-         }
-      }      
-    
-      if(m_messages.size() > 0) {
-         this->ProcessMessages();
-      }
-    
-      m_read.clear();
+	fd_set fds;
+	int highfd, r;
+	char buf[8];
 
-      //this->sleep(1);
-      usleep(10000);
-   }
+	m_read = open(m_device_name.c_str(), O_RDONLY);
+	if (m_read < 0) {
+		ERR() << "Couldn't open: " << m_device_name << endl;
+		_exit(-1);
+	}
 
-   m_read.close();
+	while (1) {
+		struct dvbhdhomerun_control_mesg mesg;
+		FD_ZERO(&fds);
+		FD_SET(pfd[0], &fds);
+		FD_SET(m_read, &fds);
+		highfd = std::max(pfd[0], m_read);
+
+		r = select(highfd + 1, &fds, NULL, NULL, NULL);
+
+		if (r == -1 && errno == EINTR)
+			continue;
+
+		if (r == -1) {
+			ERR() << "select() failure" << endl;
+			_exit(-1);
+		}
+
+		if (FD_ISSET(pfd[0], &fds)) {
+			if ( read(pfd[0], buf, sizeof(buf)) == 0) { /* it ain't gonna be anything else... */
+				break;
+			}
+		}
+
+		if (FD_ISSET(m_read, &fds)) {
+			r = read(m_read, (char*)&mesg, sizeof(dvbhdhomerun_control_mesg));
+			if ( r <= 0 ) {
+				ERR() << "read failure - errno: " << r <<  endl;
+				_exit(-1);
+			} else {
+				m_messages.push(mesg);
+			}
+		}
+
+		if(m_messages.size() > 0)
+			this->ProcessMessages();
+
+	}
+
+	close(m_read);
 }
 
 
@@ -117,6 +129,7 @@ bool Control::Ioctl(int _numOfTuners, const std::string& _name, int& _id, int _t
   }
 
   struct hdhomerun_register_tuner_data tuner_data;
+  memset(&tuner_data, 0, sizeof(tuner_data)); // Just to get around valgrind warning.
   tuner_data.num_of_devices = _numOfTuners;
   strncpy(tuner_data.name, _name.c_str(), sizeof(tuner_data.name) );
   tuner_data.name[ sizeof(tuner_data.name) - 1 ] = '\0';
@@ -293,3 +306,10 @@ void Control::StopFeed(const struct dvbhdhomerun_control_mesg& _mesg)
 
   this->WriteToDevice(_mesg);
 }
+
+void Control::pre_stop()
+{
+	close(pfd[1]);
+	return;
+}
+

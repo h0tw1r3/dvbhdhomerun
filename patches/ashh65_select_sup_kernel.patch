@@ -1,0 +1,125 @@
+--- dvbhdhomerun-vanilla/kernel//dvb_hdhomerun_control.c	2012-06-26 19:57:52.000000000 +0100
++++ dvbhdhomerun-0.0.10/kernel//dvb_hdhomerun_control.c	2012-06-26 19:50:05.000000000 +0100
+@@ -33,6 +33,7 @@
+ #include <linux/miscdevice.h>
+ #include <linux/module.h>
+ #include <linux/platform_device.h>
++#include <linux/poll.h>
+ #include <linux/slab.h>
+ #include <linux/spinlock.h>
+ #include <linux/sched.h>
+@@ -52,6 +53,16 @@
+ MODULE_LICENSE("GPL");
+ MODULE_VERSION(HDHOMERUN_VERSION);
+ 
++static unsigned int hdhomerun_control_poll(struct file *f, struct poll_table_struct *p)
++{
++	unsigned int mask = 0;
++	poll_wait(f, &inq, p);
++	poll_wait(f, &outq, p);
++	if (my_kfifo_len(&control_fifo_user) != 0) mask |= POLLIN | POLLRDNORM; /* readable */
++	mask |= POLLOUT | POLLWRNORM; /* writable... always? */
++	return mask;
++}
++
+ static ssize_t hdhomerun_control_read(struct file *f, char *buf,
+ 				      size_t count, loff_t *offset)
+ {
+@@ -67,8 +78,12 @@
+ 	if (count == 0)
+ 		return 0;
+ 
+-	if(my_kfifo_len(&control_fifo_user) == 0)
+-		return 0;
++	while(my_kfifo_len(&control_fifo_user) <= 0) {
++		if (f->f_flags & O_NONBLOCK)
++			return -EAGAIN;
++		if (wait_event_interruptible(inq, (my_kfifo_len(&control_fifo_user) != 0) ))
++			return -ERESTARTSYS;
++	}
+ 
+ 	user_data = kmalloc(count, GFP_KERNEL);
+ 	if (!user_data)
+@@ -107,6 +122,12 @@
+ 	}
+ 	
+ 	if(wait_for_write) {
++		while(my_kfifo_len(&control_fifo_kernel) == control_bufsize) {
++			if (f->f_flags & O_NONBLOCK)
++				return -EAGAIN;
++			if (wait_event_interruptible(outq, (my_kfifo_len(&control_fifo_kernel) < control_bufsize) ))
++				return -ERESTARTSYS;
++		}
+ 		retval = my_kfifo_put(&control_fifo_kernel, user_data, count);
+ 	} else {
+ 		DEBUG_OUT(HDHOMERUN_CONTROL, "%s ignoring write\n", __FUNCTION__);
+@@ -220,6 +241,7 @@
+ 	.write = hdhomerun_control_write,
+ 	.open = hdhomerun_control_open,
+ 	.release = hdhomerun_control_release,
++	.poll = hdhomerun_control_poll,
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,36)
+ 	.unlocked_ioctl = hdhomerun_control_ioctl,
+ #else
+@@ -264,6 +286,8 @@
+ 		return PTR_ERR(&control_fifo_kernel);
+ 	}
+ 	init_waitqueue_head(&control_readq);
++	init_waitqueue_head(&inq);
++	init_waitqueue_head(&outq);
+ 
+ error:
+ 	return ret;
+@@ -272,7 +296,6 @@
+ 
+ void dvb_hdhomerun_control_exit() {
+ 	DEBUG_FUNC(1);
+-
+ #if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,32)
+ 	kfifo_free(&control_fifo_user);
+ 	kfifo_free(&control_fifo_kernel);
+
+diff -ur dvbhdhomerun-vanilla/kernel//dvb_hdhomerun_core.c dvbhdhomerun-0.0.10/kernel//dvb_hdhomerun_core.c
+--- dvbhdhomerun-vanilla/kernel//dvb_hdhomerun_core.c	2012-06-26 19:57:52.000000000 +0100
++++ dvbhdhomerun-0.0.10/kernel//dvb_hdhomerun_core.c	2012-06-26 19:51:11.000000000 +0100
+@@ -44,6 +44,12 @@
+ wait_queue_head_t control_readq;
+ EXPORT_SYMBOL(control_readq);
+ 
++wait_queue_head_t inq;
++EXPORT_SYMBOL(inq);
++
++wait_queue_head_t outq;
++EXPORT_SYMBOL(outq);
++
+ int control_bufsize = 32768;
+ EXPORT_SYMBOL(control_bufsize);
+ 
+@@ -76,6 +82,7 @@
+ 		} else {
+ 			ret = 1;
+ 		}
++		wake_up_interruptible(&inq);
+ 	}
+ 	return ret;
+ }
+@@ -93,6 +100,7 @@
+ 	} while(my_kfifo_len(&control_fifo_kernel) == 0);
+ 
+ 	return my_kfifo_get(&control_fifo_kernel, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg));
++	wake_up_interruptible(&outq);
+ }
+ EXPORT_SYMBOL(hdhomerun_control_wait_for_message);
+ 
+diff -ur dvbhdhomerun-vanilla/kernel//dvb_hdhomerun_core.h dvbhdhomerun-0.0.10/kernel//dvb_hdhomerun_core.h
+--- dvbhdhomerun-vanilla/kernel//dvb_hdhomerun_core.h	2012-06-26 19:57:52.000000000 +0100
++++ dvbhdhomerun-0.0.10/kernel//dvb_hdhomerun_core.h	2012-06-26 19:51:18.000000000 +0100
+@@ -36,6 +36,8 @@
+ extern int wait_for_write;
+ extern int userspace_ready;
+ extern wait_queue_head_t control_readq;
++extern wait_queue_head_t inq;
++extern wait_queue_head_t outq;
+ extern int control_bufsize;
+ extern spinlock_t control_spinlock_user;
+ extern spinlock_t control_spinlock_kernel;

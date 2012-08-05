@@ -59,18 +59,6 @@ static void usage(const char* argv0)
 
 bool g_stop = false;
 
-static void sigexit(int)
-{
-   LOG() << "Exiting" << endl;
-   g_stop = true;
-}
-
-static void handle_sigpipe(int x)
-{
-   return;
-}
-
-
 int main(int argc, char** argv)
 {
    //
@@ -81,6 +69,11 @@ int main(int argc, char** argv)
    std::string logFileName;
    bool forkChild = false;
    int c;
+
+   sigset_t signal_set;
+   sigfillset( &signal_set );
+   pthread_sigmask( SIG_BLOCK, &signal_set, NULL );
+
    while((c = getopt(argc, argv, "u:g:fl:")) != -1)
    {
       switch(c)
@@ -168,16 +161,28 @@ int main(int argc, char** argv)
    //
    HdhomerunController hdhomerun(4);
 
+
    //
    // Wait for signals to stop
    //
-   signal(SIGPIPE, handle_sigpipe);
-   signal(SIGINT, sigexit);
-   signal(SIGTERM, sigexit);
-   while(!g_stop) {
-      usleep(10000000);
-   }
+   sigset_t read_set;
+   int sig;
+   while ( !g_stop ) {
+      sigfillset( &read_set );
+      sigwait( &read_set, &sig );
 
+      switch ( sig ) {
+      case SIGINT:
+      case SIGTERM:
+         LOG() << "Exiting" << endl;
+         g_stop = true;
+         break;
+
+      default:
+         break;
+      }
+   }
+   
    return 0;
 }
 

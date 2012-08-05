@@ -26,6 +26,7 @@ int ThreadPthread::start()
 void ThreadPthread::stop()
 {
   m_stop = true;
+  pre_stop();
   while(m_running)
   {
     usleep(100000);

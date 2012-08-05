@@ -37,7 +37,7 @@ class Control : public ThreadPthread
   ~Control();
   
   void run();
-
+  void pre_stop();
    bool Ioctl(int _numOfTuners, const std::string& _name, int& _id, int type, bool _useFullName);
 
  private:
@@ -58,8 +58,9 @@ class Control : public ThreadPthread
   void WriteToDevice(const struct dvbhdhomerun_control_mesg& mesg);
 
  private:
-  std::ifstream m_read;
   std::ofstream m_write;
+  int m_read;
+  int pfd[2];
   int m_fdIoctl;
 
   std::queue<dvbhdhomerun_control_mesg> m_messages;

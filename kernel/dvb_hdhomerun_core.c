@@ -44,6 +44,12 @@ EXPORT_SYMBOL(control_spinlock_kernel);
 wait_queue_head_t control_readq;
 EXPORT_SYMBOL(control_readq);
 
+wait_queue_head_t inq;
+EXPORT_SYMBOL(inq);
+
+wait_queue_head_t outq;
+EXPORT_SYMBOL(outq);
+
 int control_bufsize = 32768;
 EXPORT_SYMBOL(control_bufsize);
 
@@ -76,6 +82,7 @@ int hdhomerun_control_post_message(struct dvbhdhomerun_control_mesg *mesg) {
 		} else {
 			ret = 1;
 		}
+		wake_up_interruptible(&inq);
 	}
 	return ret;
 }
@@ -93,6 +100,7 @@ int hdhomerun_control_wait_for_message(struct dvbhdhomerun_control_mesg *mesg) {
 	} while(my_kfifo_len(&control_fifo_kernel) == 0);
 
 	return my_kfifo_get(&control_fifo_kernel, (unsigned char*)mesg, sizeof(struct dvbhdhomerun_control_mesg));
+	wake_up_interruptible(&outq);
 }
 EXPORT_SYMBOL(hdhomerun_control_wait_for_message);
 

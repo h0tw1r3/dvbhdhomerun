@@ -14,6 +14,7 @@ public:
 
 protected:
   virtual void run() = 0;
+  virtual void pre_stop() { return; };
 
 protected:
   bool m_stop;
