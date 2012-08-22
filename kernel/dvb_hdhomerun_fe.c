@@ -103,35 +103,47 @@ static int dvb_hdhomerun_fe_read_ucblocks(struct dvb_frontend* fe, u32* ucblocks
 	return 0;
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+static int dvb_hdhomerun_fe_get_frontend(struct dvb_frontend* fe)
+#else
 static int dvb_hdhomerun_fe_get_frontend(struct dvb_frontend* fe, struct dvb_frontend_parameters *p)
+#endif
 {
 	DEBUG_FUNC(1);
 	return 0;
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+static int dvb_hdhomerun_fe_set_frontend(struct dvb_frontend* fe)
+#else
 static int dvb_hdhomerun_fe_set_frontend(struct dvb_frontend* fe, struct dvb_frontend_parameters *p)
+#endif
 {
 	struct dvb_hdhomerun_fe_state* state = fe->demodulator_priv;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+	struct dtv_frontend_properties *p = &fe->dtv_property_cache;
+#endif
+
 	DEBUG_FUNC(1);
 	if (fe->ops.tuner_ops.set_params) {
-		fe->ops.tuner_ops.set_params(fe, p);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+		fe->ops.tuner_ops.set_params(fe);
+#else
+		fe->ops.tuner_ops.set_params(fe,p);
+#endif
 		if (fe->ops.i2c_gate_ctrl)
 			fe->ops.i2c_gate_ctrl(fe, 0);
 	}
 
-	DEBUG_OUT(HDHOMERUN_FE, "FE_SET_FRONTEND, freq: %d, inv: %d, symb rate: %d, fec: %d, mod: %d\n",
-		  p->frequency,
-		  p->inversion,
-		  p->u.qam.symbol_rate,
-		  p->u.qam.fec_inner,    
-		  p->u.qam.modulation);    
+	DEBUG_OUT(HDHOMERUN_FE, "FE_SET_FRONTEND, freq: %d\n",
+             p->frequency);
 
 	{
 		struct dvbhdhomerun_control_mesg mesg;
 		mesg.type = DVB_HDHOMERUN_FE_SET_FRONTEND;
 		mesg.id = state->id;
-		mesg.u.frontend_parameters = *p;
+		mesg.u.frequency = p->frequency;
 		
 		hdhomerun_control_post_and_wait(&mesg);
 	}
@@ -186,19 +198,30 @@ static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_pa
 	return dvb_hdhomerun_fe_set_frontend(fe, params);
 }
 #else
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, bool re_tune, 
+#else
 static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_parameters *params,
+#endif
 					unsigned int mode_flags, unsigned int *delay, fe_status_t *status)
 {
+   int ret;
 	DEBUG_FUNC(1);
 
 	//*delay = HZ / 5;
 	*delay = 60 * HZ;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+	ret = dvb_hdhomerun_fe_set_frontend(fe);
+	if (ret)
+           return ret;
+#else
 	if (params) {
-		int ret = dvb_hdhomerun_fe_set_frontend(fe, params);
+		ret = dvb_hdhomerun_fe_set_frontend(fe, params);
 		if (ret)
                         return ret;
 	}
+#endif
 
 	return dvb_hdhomerun_fe_read_status(fe, status);
 }
@@ -235,13 +258,16 @@ error:
 }
 
 static struct dvb_frontend_ops dvb_hdhomerun_fe_ofdm_ops = {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+        .delsys = { SYS_DVBT },
+#endif
         .info = {
                 .name                   = "HDHomeRun DVB-T",
                 .type                   = FE_OFDM,
                 .frequency_stepsize     = 62500,
                 .frequency_min          = 50500000,
                 .frequency_max          = 862000000,
-		.caps =
+        .caps =
 		    FE_CAN_FEC_1_2 | FE_CAN_FEC_2_3 | FE_CAN_FEC_3_4 |
 		    FE_CAN_FEC_5_6 | FE_CAN_FEC_7_8 | FE_CAN_FEC_AUTO |
 		    FE_CAN_QPSK | FE_CAN_QAM_16 | FE_CAN_QAM_64 | FE_CAN_QAM_AUTO |
@@ -294,6 +320,9 @@ error:
 }
 
 static struct dvb_frontend_ops dvb_hdhomerun_fe_qam_ops = {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+   .delsys = { SYS_DVBC_ANNEX_A },
+#endif
 	.info = {
 		.name			= "HDHomeRun DVB-C",
 		.type			= FE_QAM,
@@ -353,6 +382,9 @@ error:
 }
 
 static struct dvb_frontend_ops dvb_hdhomerun_fe_atsc_ops = {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+   .delsys = { SYS_ATSC },
+#endif
 	.info = {
 		.name			= "HDHomeRun ATSC",
 		.type			= FE_ATSC,

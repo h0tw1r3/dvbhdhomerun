@@ -22,6 +22,7 @@
 #include "log_file.h"
 
 #include <assert.h>
+#include <cstdlib>
 #include <iostream>
 
 using namespace std;
@@ -35,7 +36,7 @@ LogFile::LogFile()
    if(pthread_mutex_init(&m_mutexLogFile, NULL))
    {
       cerr << "Can't initialize mutex" << endl;
-      _exit(-1);
+      exit(-1);
    }
 }
 

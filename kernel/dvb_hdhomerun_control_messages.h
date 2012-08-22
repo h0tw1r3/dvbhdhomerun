@@ -59,7 +59,7 @@ struct hdhomerun_register_tuner_data {
 struct dvbhdhomerun_control_mesg {
 	unsigned int type;
 	union {
-		struct dvb_frontend_parameters frontend_parameters;
+		unsigned int frequency;
 		fe_status_t fe_status;
 		int16_t signal_strength;
 		struct dmx_pes_filter_params dmx_pes_filter;

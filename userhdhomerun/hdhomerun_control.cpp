@@ -193,18 +193,13 @@ void Control::ProcessMessages()
 
 void Control::FE_SET_Frontend(const struct dvbhdhomerun_control_mesg& _mesg)
 {
-  dvb_frontend_parameters frontend_param = _mesg.u.frontend_parameters;
-  printf("FE_SET_FRONTEND, freq: %d, inv: %d, symb rate: %d, fec: %d, mod: %d\n",
-	 frontend_param.frequency,
-	 frontend_param.inversion,
-	 frontend_param.u.qam.symbol_rate,
-	 frontend_param.u.qam.fec_inner,    
-	 frontend_param.u.qam.modulation);    
+  printf("FE_SET_FRONTEND, freq: %d\n",
+         _mesg.u.frequency);
   
   // Need to send stuff to HDHOMERUN
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
   if(tuner) {
-     int ret = tuner->Tune(frontend_param.frequency);
+     int ret = tuner->Tune(_mesg.u.frequency);
   }
   else {
      ERR() << "Tuner id does not exist!" << _mesg.id << endl;
