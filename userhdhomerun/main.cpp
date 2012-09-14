@@ -53,6 +53,7 @@ static void usage(const char* argv0)
    printf(" -u <username>   Run as user <username>. Requires -f\n");
    printf(" -g <groupname>  Run as group <groupname>. Requires -f\n");
    printf(" -l <log file>   Default is /var/log/dvbhdhomerun.log. Requires -f\n");
+   printf(" -d disable logging\n");
    printf("\n");
    exit(0);
 }
@@ -68,13 +69,14 @@ int main(int argc, char** argv)
    const char* groupName = NULL;
    std::string logFileName;
    bool forkChild = false;
+   bool disableLogging = false;
    int c;
 
    sigset_t signal_set;
    sigfillset( &signal_set );
    pthread_sigmask( SIG_BLOCK, &signal_set, NULL );
 
-   while((c = getopt(argc, argv, "u:g:fl:")) != -1)
+   while((c = getopt(argc, argv, "u:g:fdl:")) != -1)
    {
       switch(c)
       {
@@ -90,12 +92,19 @@ int main(int argc, char** argv)
       case 'l':
          logFileName = optarg;
          break;
+      case 'd':
+         disableLogging = true;
+         break;
       default:
          usage(argv[0]);
          break;
       }
    }
 
+   if(disableLogging) {
+      logFile.DisableLogging();
+   }
+   
    if(forkChild) {
       // Setup logging
       if(logFileName.empty()) {

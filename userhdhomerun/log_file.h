@@ -47,6 +47,7 @@ public:
 
    void SetLogType(LogFile::LogType _type);
    bool SetAndOpenLogFile(const std::string& _fileName);
+   void DisableLogging();
    
 protected:
    int overflow(int _i);
@@ -61,6 +62,8 @@ private:
    std::ofstream m_logFile;
 
    pthread_mutex_t m_mutexLogFile;
+
+   bool m_disabled;
 };
 
 extern LogFile logFile;

@@ -30,7 +30,7 @@ using namespace std;
 LogFile logFile;
 
 LogFile::LogFile()
-   : ostream(this), m_logTo(LogFile::NONE)
+   : ostream(this), m_logTo(LogFile::NONE), m_disabled(false)
 {
    // Initialize the mutex
    if(pthread_mutex_init(&m_mutexLogFile, NULL))
@@ -50,6 +50,11 @@ void LogFile::SetLogType(LogFile::LogType _type)
    m_logTo = static_cast<LogFile::LogType>(m_logTo | _type);
 }
 
+void LogFile::DisableLogging()
+{
+   m_disabled = true;
+}
+
 bool LogFile::SetAndOpenLogFile(const std::string& _fileName)
 {
    m_logFileName = _fileName;
@@ -65,6 +70,10 @@ bool LogFile::SetAndOpenLogFile(const std::string& _fileName)
 
 int LogFile::overflow(int _i)
 {
+   if(m_disabled) {
+      return _i;
+   }
+   
    m_buffer += _i;
    
    if(_i == '\n')  {

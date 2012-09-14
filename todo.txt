@@ -27,8 +27,6 @@ and restart the procps service, or reboot."
 
 Kernel Module:
 
-* Kernel 3.3 borks kernel driver. Use DVBv5 (ticket 8)
-
 * Remove unneeded DVB functions.
 
 * Init:
@@ -38,6 +36,8 @@ Kernel Module:
   * Decide which functions to put under each bit pattern.
 
 + Use HDHomeRun ID in the device name.
+
++ Kernel 3.3 borks kernel driver. Use DVBv5 (ticket 8)
 
 UserHDHomerun:
 
