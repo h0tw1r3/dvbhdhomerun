@@ -188,7 +188,7 @@ std::string HdhomerunTuner::GetStrFromPidFilter()
       ostringstream str;
 
       vector<int>::iterator it;
-      for(it = m_pidFilters.begin(); it != m_pidFilters.end(); it++)  {
+      for(it = m_pidFilters.begin(); it != m_pidFilters.end(); ++it)  {
          str << "0x" << hex << uppercase << *it << " ";
       }
     

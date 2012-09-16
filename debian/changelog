@@ -1,3 +1,17 @@
+dvbhdhomerun (0.0.11-1) lucid; urgency=low
+
+  * Version 0.0.11
+  * Userhdhomerun:
+    * -d added to disable logging.
+    * Compile fixes for kernel 3.3, 3.4 and 3.5.
+    * Use select() and change signal handling behaviour slightly.
+
+  * Kernel:
+    * Add select() support to kernel module.
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 16 sep 2012 13:00:00 +0100
+
+
 dvbhdhomerun (0.0.10-1) lucid; urgency=low
 
   * Version 0.0.10

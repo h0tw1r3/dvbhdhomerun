@@ -36,7 +36,7 @@ using namespace std;
 
 Control::Control(HdhomerunController* _hdhomerun) 
 : m_device_name("/dev/hdhomerun_control"), 
-  m_hdhomerun(_hdhomerun), m_fdIoctl(0)
+  m_hdhomerun(_hdhomerun), m_fdIoctl(0), m_read(0)
 {
   m_write.open(m_device_name.c_str(), ios::binary);
   if(!m_write) {
@@ -97,7 +97,7 @@ void Control::run()
 			}
 		}
 
-		if(m_messages.size() > 0)
+		if(!m_messages.empty())
 			this->ProcessMessages();
 
 	}
