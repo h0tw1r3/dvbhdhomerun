@@ -28,8 +28,6 @@ If you need to build it yourself:
 
 Fetch the user space libraries from SiliconDust's homepage:
 http://www.silicondust.com/support/hdhomerun/downloads/linux/
-(currently:
-http://download.silicondust.com/hdhomerun/libhdhomerun_20100828.tgz)
 
 untar the package (tar xvfz libhdhomerun_xxx.tgz) to a directory of
 your choice. In that directory:
