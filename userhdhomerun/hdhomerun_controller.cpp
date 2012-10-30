@@ -26,6 +26,7 @@
 #include "hdhomerun_tuner.h"
 #include "log_file.h"
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -102,6 +103,8 @@ HdhomerunController::HdhomerunController(int _maxDevices)
   //
   m_control = new Control(this);
 
+  std::sort(m_tuners.begin(), m_tuners.end(), CompareHdhomerunTuner);
+  
   vector<HdhomerunTuner*>::iterator it;
   for(it = m_tuners.begin(); it != m_tuners.end(); ++it) {
     int kernelId = 0;

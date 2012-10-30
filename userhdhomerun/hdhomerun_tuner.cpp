@@ -354,3 +354,9 @@ void HdhomerunTuner::LogNetworkStat() const
    LOG() << "Transport error count : " << m_stats_cur.transport_error_count - m_stats_old.transport_error_count << endl;
    LOG() << "Sequence error count  : " << m_stats_cur.sequence_error_count - m_stats_old.sequence_error_count << endl;
 }
+
+bool CompareHdhomerunTuner(HdhomerunTuner* _tuner1, HdhomerunTuner* _tuner2)
+{
+   return _tuner1->GetName() < _tuner2->GetName();
+}
+

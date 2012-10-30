@@ -28,6 +28,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 class HdhomerunTuner : public ThreadPthread
 {
@@ -119,5 +120,7 @@ private:
    struct hdhomerun_video_stats_t m_stats_old;
    struct hdhomerun_video_stats_t m_stats_cur;
 };
+
+bool CompareHdhomerunTuner(HdhomerunTuner* _tuner1, HdhomerunTuner* _tuner2);
 
 #endif // _hdhomerun_tuner_h_

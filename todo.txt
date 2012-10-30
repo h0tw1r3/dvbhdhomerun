@@ -2,6 +2,9 @@ General:
 
 * Check documentation for references.
 
+* Version check between kernel module and userhdhomerun application?
+  * Print out version of userhdhomerun in help.
+
 * Wait for /dev/dvb to startup?
 #!/bin/bash
 service dvbhdhomerun-utils start
@@ -10,12 +13,6 @@ do
         sleep 1
 done
 service tvheadend start
-
-+ upstart, check last post from silicondust.
-  + use net-device-up IFACE!=lo?
-
-+ Respawn so that crashes won't hurt us:
-
 
 * Page allocation failure:
 "On Ubuntu Oneiric, the easiest way to do this is to create a file /etc/sysctl.d/60-dvbhdhomerun.conf containing the line:-
@@ -35,9 +32,6 @@ Kernel Module:
 * Debug
   * Decide which functions to put under each bit pattern.
 
-+ Use HDHomeRun ID in the device name.
-
-+ Kernel 3.3 borks kernel driver. Use DVBv5 (ticket 8)
 
 UserHDHomerun:
 
@@ -50,13 +44,4 @@ UserHDHomerun:
 
 * Add locking of tuner?
 
-
-+ Patch from Paul C. Prime.
-  + MAX_TUNERS=2 get rid of that, use values from struct if available.
-
-+ Log that DVB-C is used when dvbt is reported.
-
-+ Can we fail writing logfiles? (ticket 5).
-
-+ Disable/enable tuners in conf file. Default enable.
-  
++ Sort the tuners based on their name, so they appear in same order.

@@ -1,3 +1,28 @@
+dvbhdhomerun (0.0.14-1) lucid; urgency=low
+
+  * Preparing for Version 0.0.14
+    * Sort the tuners based on their name, so they appear in same order 
+      in /dev/adapter/xxx.
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Tue, 30 oct 2012 22:00:00 +0100
+
+dvbhdhomerun (0.0.13-1) precise; urgency=low
+
+  * Version 0.0.13 for precise (12.04+)
+    * Yet another attempt at getting a build correct at Launchpad for
+      precise++ (sigh...).
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Tue, 17 sep 2012 22:00:00 +0100
+
+dvbhdhomerun (0.0.12-1) precise; urgency=low
+
+  * Version 0.0.12 for precise (12.04+)
+    * Exactly the same version as 0.0.1 just with version number bumbed due
+      to sillyness in launchpad.
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Mon, 17 sep 2012 22:00:00 +0100
+
+
 dvbhdhomerun (0.0.11-1) lucid; urgency=low
 
   * Version 0.0.11
