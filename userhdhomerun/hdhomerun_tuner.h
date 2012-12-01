@@ -90,7 +90,7 @@ private:
 
 private:
    struct hdhomerun_device_t* m_device;
-
+   struct hdhomerun_debug_t* m_dbg;
    bool m_stream;
   
    std::string m_pes_filter;

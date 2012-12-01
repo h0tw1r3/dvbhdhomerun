@@ -15,6 +15,7 @@ done
 service tvheadend start
 
 * Page allocation failure:
+  * Gid rid of kmalloc for each write in hdhomerun_data_write() ?
 "On Ubuntu Oneiric, the easiest way to do this is to create a file /etc/sysctl.d/60-dvbhdhomerun.conf containing the line:-
 
 vm.min_free_kbytes = 65536
@@ -34,6 +35,8 @@ Kernel Module:
 
 
 UserHDHomerun:
+
+* Configure whether libhdhomerun debugging is on?
 
 * Need to use conf file to configure number of tuners?
 

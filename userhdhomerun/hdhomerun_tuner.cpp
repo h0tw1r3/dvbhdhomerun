@@ -37,12 +37,17 @@
 using namespace std;
 
 HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner) 
-  : m_device(0), m_stream(false), m_prevFreq(0),
+  : m_device(0), m_dbg(0), m_stream(false), m_prevFreq(0),
     m_deviceId(_device_id), m_deviceIP(_device_ip), m_tuner(_tuner),
     m_kernelId(-1), m_useFullName(false), m_isDisabled(false),
     m_type(HdhomerunTuner::NOT_SET)
 {
-   m_device = hdhomerun_device_create(m_deviceId, m_deviceIP, m_tuner, NULL);
+   m_dbg = hdhomerun_debug_create();
+   hdhomerun_debug_set_filename(m_dbg, "/var/log/dvbhdhomerun_libhdhomerun.log");
+   hdhomerun_debug_enable(m_dbg);
+
+   m_device = hdhomerun_device_create(m_deviceId, m_deviceIP, m_tuner, m_dbg);
+   hdhomerun_debug_printf(m_dbg, "Debug enabled\n");
    
    m_name = hdhomerun_device_get_name(m_device);
    LOG() << endl << "Name of device: " << m_name << endl;
@@ -120,6 +125,8 @@ HdhomerunTuner::HdhomerunTuner(int _device_id, int _device_ip, int _tuner)
 HdhomerunTuner::~HdhomerunTuner()
 {
    this->StopStreaming(0x2000);
+   hdhomerun_debug_close(m_dbg,1000);
+   hdhomerun_debug_destroy(m_dbg);
    hdhomerun_device_destroy(m_device);
 }
 
