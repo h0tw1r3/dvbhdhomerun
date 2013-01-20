@@ -15,6 +15,7 @@ done
 service tvheadend start
 
 * Page allocation failure:
+  * Ticket #14 has the right idea.
   * Gid rid of kmalloc for each write in hdhomerun_data_write() ?
 "On Ubuntu Oneiric, the easiest way to do this is to create a file /etc/sysctl.d/60-dvbhdhomerun.conf containing the line:-
 
@@ -24,6 +25,11 @@ and restart the procps service, or reboot."
 
 
 Kernel Module:
+
++ Ticket #14 use a per device buffer instead.
+
+* Ticket #15 Makefile that fixes compile under Kernel 3.7.x. Include
+  headers changed location.
 
 * Remove unneeded DVB functions.
 

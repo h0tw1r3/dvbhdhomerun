@@ -43,11 +43,13 @@
 struct hdhomerun_data_state *hdhomerun_data_states[HDHOMERUN_MAX_TUNERS];
 
 struct hdhomerun_data_state {
-	struct dvb_demux *dvb_demux;
-	int id;
-	dev_t dev;
-	struct cdev cdev;
-	struct device *device;
+   struct dvb_demux *dvb_demux;
+   int id;
+   dev_t dev;
+   struct cdev cdev;
+   struct device *device;
+   char *write_buffer;
+   ssize_t write_buffer_size;
 };
 
 static dev_t hdhomerun_major = -1;
@@ -60,165 +62,183 @@ MODULE_LICENSE("GPL");
 MODULE_VERSION(HDHOMERUN_VERSION);
 
 static ssize_t hdhomerun_data_write(struct file *f, const char __user *buf,
-				       size_t count, loff_t *offset)
+                                    size_t count, loff_t *offset)
 {
-	char *user_data;
-	ssize_t retval = count;
+   struct hdhomerun_data_state *state = f->private_data;
 
-	struct hdhomerun_data_state *state = f->private_data;
+   DEBUG_FUNC(1);
+   DEBUG_OUT(HDHOMERUN_DATA, "Count: %Zu, offset %lld\n", count, *offset);
 	
-	DEBUG_FUNC(1);
-	DEBUG_OUT(HDHOMERUN_DATA, "Count: %Zu, offset %lld\n", count, *offset);
-	
-	user_data = kmalloc(count, GFP_KERNEL);
-	if(!user_data) {
-		retval = -ENOMEM;
-		goto error;
-	}
-	
-	if (copy_from_user(user_data, buf, count)) {
-		retval = -EFAULT;
-		goto error;
-	}
-	
-	/* Feed stuff to V4l-DVB */
-	dvb_dmx_swfilter(state->dvb_demux, user_data, count);
+   // new buffer need to be allocated ?
+   if( (state->write_buffer == NULL) || (count > state->write_buffer_size) ) {
+      // free old buffer
+      if(state->write_buffer) {
+         kfree(state->write_buffer);
+         state->write_buffer = NULL;
+         state->write_buffer_size = 0;
+      }
 
-error:
-	kfree(user_data);
-	return retval;
+      // allocate a bigger buffer
+      state->write_buffer = kmalloc(count, GFP_KERNEL);
+      if(!state->write_buffer) {
+         printk(KERN_ERR "hdhomerun: unable to allocate buffer of %Zu bytes for device %d\n", count, state->id);
+         return -ENOMEM;
+      }
+      state->write_buffer_size = count;
+      printk(KERN_INFO "hdhomerun: allocated buffer of %Zu bytes for device %d\n", count, state->id);
+   }
+
+   // write_buffer is allocated and is big enough
+   if (copy_from_user(state->write_buffer, buf, count)) {
+      return -EFAULT;
+   }
+	
+   /* Feed stuff to V4l-DVB */
+   dvb_dmx_swfilter(state->dvb_demux, state->write_buffer, count);
+
+   return count;
 }
 
 static int hdhomerun_data_open(struct inode *inode, struct file *file)
 {
-	struct hdhomerun_data_state *state;
+   struct hdhomerun_data_state *state;
 
-	DEBUG_FUNC(1);
+   DEBUG_FUNC(1);
 
-	state = container_of(inode->i_cdev, struct hdhomerun_data_state, cdev);
-	DEBUG_OUT(HDHOMERUN_DATA, "Open major: %d\n", MAJOR(hdhomerun_major));
+   state = container_of(inode->i_cdev, struct hdhomerun_data_state, cdev);
+   DEBUG_OUT(HDHOMERUN_DATA, "Open major: %d\n", MAJOR(hdhomerun_major));
 
-	file->private_data = state;
+   file->private_data = state;
 
-	return 0;
+   return 0;
 }
 
 static int hdhomerun_data_release(struct inode *inode, struct file *file)
 {
-	DEBUG_FUNC(1);
+   DEBUG_FUNC(1);
 
-	return 0;
+   return 0;
 }
 
 static struct file_operations hdhomerun_data_fops = {
-	.owner = THIS_MODULE,
-	.write = hdhomerun_data_write,
-	.open = hdhomerun_data_open,
-	.release = hdhomerun_data_release,
+   .owner = THIS_MODULE,
+   .write = hdhomerun_data_write,
+   .open = hdhomerun_data_open,
+   .release = hdhomerun_data_release,
 };
 
 int dvb_hdhomerun_data_init(int num_of_devices) {
-	int ret = 0;
+   int ret = 0;
 
-	if(hdhomerun_major == -1) {
-		/* Create class (should I use an existing?) */
-		hdhomerun_class = class_create(THIS_MODULE, "hdhomerun");
-		if (IS_ERR(hdhomerun_class)) {
-			ret = PTR_ERR(hdhomerun_class);
-			goto fail_class_create;
-		}
+   if(hdhomerun_major == -1) {
+      /* Create class (should I use an existing?) */
+      hdhomerun_class = class_create(THIS_MODULE, "hdhomerun");
+      if (IS_ERR(hdhomerun_class)) {
+         ret = PTR_ERR(hdhomerun_class);
+         goto fail_class_create;
+      }
 	
-		/* Create major */
-		ret = alloc_chrdev_region(&hdhomerun_major, 0, num_of_devices, "hdhomerun_data");
-		if(ret < 0) {
-			printk(KERN_WARNING "hdhomerun: Can't get major: %d, num of devices: %d\n", MAJOR(hdhomerun_major), num_of_devices);
-		}
+      /* Create major */
+      ret = alloc_chrdev_region(&hdhomerun_major, 0, num_of_devices, "hdhomerun_data");
+      if(ret < 0) {
+         printk(KERN_WARNING "hdhomerun: Can't get major: %d, num of devices: %d\n", MAJOR(hdhomerun_major), num_of_devices);
+      }
 
-		hdhomerun_num_of_devices = num_of_devices;
-	}
+      hdhomerun_num_of_devices = num_of_devices;
+   }
 
-	return ret;
+   return ret;
 
-fail_class_create:
-	printk(KERN_ERR "unable to create class for hdhomerun\n");
-	return ret;
+ fail_class_create:
+   printk(KERN_ERR "unable to create class for hdhomerun\n");
+   return ret;
 }
 EXPORT_SYMBOL(dvb_hdhomerun_data_init);
   
 int dvb_hdhomerun_data_create_device(struct dvb_demux *dvb_demux, int id) {
-	struct hdhomerun_data_state *state;
-	int major;
-	int minor;
-	int ret = 0;
+   struct hdhomerun_data_state *state;
+   int major;
+   int minor;
+   int ret = 0;
 
-	DEBUG_FUNC(1);
+   DEBUG_FUNC(1);
 
-	if(hdhomerun_major == -1) {
-		printk(KERN_ERR "hdhomerun: class not created yet!\n");
-		return -1;
-	}
+   if(hdhomerun_major == -1) {
+      printk(KERN_ERR "hdhomerun: class not created yet!\n");
+      return -1;
+   }
 
-	/* setup internal structure for storing data */
-	state = kzalloc(sizeof(struct hdhomerun_data_state), GFP_KERNEL);
-	if (state == NULL) {
-		printk(KERN_ERR
-		       "HDHomeRun: out of memory for data device %d\n",
-		       id);
-		return -ENOMEM;
-	}
+   /* setup internal structure for storing data */
+   state = kzalloc(sizeof(struct hdhomerun_data_state), GFP_KERNEL);
+   if (state == NULL) {
+      printk(KERN_ERR
+             "HDHomeRun: out of memory for data device %d\n",
+             id);
+      return -ENOMEM;
+   }
 
-	state->dvb_demux = dvb_demux;
-	state->id = id;
+   state->dvb_demux = dvb_demux;
+   state->id = id;
 
-	/* Create dev_t for this tuner */
-	major = MAJOR(hdhomerun_major);
-	minor = MINOR(hdhomerun_major);
-	state->dev = MKDEV(major, minor + id);
+   /* buffer */
+   state->write_buffer = NULL;
+   state->write_buffer_size = 0;
 
-	/* Create the character device */
-	cdev_init(&state->cdev, &hdhomerun_data_fops);
-	state->cdev.owner = THIS_MODULE;
-	state->cdev.ops = &hdhomerun_data_fops;
+   /* Create dev_t for this tuner */
+   major = MAJOR(hdhomerun_major);
+   minor = MINOR(hdhomerun_major);
+   state->dev = MKDEV(major, minor + id);
 
-	ret = cdev_add(&state->cdev, state->dev, 1);
-	if(ret < 0) {
-		printk(KERN_WARNING "hdhomerun: Can't add char device: %d %d\n", major, minor);
-	}
+   /* Create the character device */
+   cdev_init(&state->cdev, &hdhomerun_data_fops);
+   state->cdev.owner = THIS_MODULE;
+   state->cdev.ops = &hdhomerun_data_fops;
 
-	/* Create device file and sysfs entry */
-	state->device = device_create(hdhomerun_class, NULL, state->dev, NULL, "hdhomerun_data%d", id);
-	if(IS_ERR(state->device)) {
-		ret = PTR_ERR(state->device);
-		goto fail_device_create;
-	}
-	printk(KERN_INFO "hdhomerun: device /dev/hdhomerun_data%d created\n", id);
+   ret = cdev_add(&state->cdev, state->dev, 1);
+   if(ret < 0) {
+      printk(KERN_WARNING "hdhomerun: Can't add char device: %d %d\n", major, minor);
+   }
+
+   /* Create device file and sysfs entry */
+   state->device = device_create(hdhomerun_class, NULL, state->dev, NULL, "hdhomerun_data%d", id);
+   if(IS_ERR(state->device)) {
+      ret = PTR_ERR(state->device);
+      goto fail_device_create;
+   }
+   printk(KERN_INFO "hdhomerun: device /dev/hdhomerun_data%d created\n", id);
 	
-	hdhomerun_data_states[id] = state;
+   hdhomerun_data_states[id] = state;
 
-	return ret;
+   return ret;
 
-fail_device_create:
-	printk(KERN_ERR "unable to create device /dev/hdhomerun%d\n", id);
-	return ret;
+ fail_device_create:
+   printk(KERN_ERR "unable to create device /dev/hdhomerun%d\n", id);
+   return ret;
 }
 EXPORT_SYMBOL(dvb_hdhomerun_data_create_device);
 
 void dvb_hdhomerun_data_delete_device(int id) {
-	DEBUG_FUNC(1);
+   DEBUG_FUNC(1);
 
-	cdev_del(&hdhomerun_data_states[id]->cdev);
-	device_destroy(hdhomerun_class, hdhomerun_data_states[id]->dev);
+   /* free allocated buffer */
+   if(hdhomerun_data_states[id]->write_buffer != NULL) {
+      kfree(hdhomerun_data_states[id]->write_buffer);
+      hdhomerun_data_states[id]->write_buffer = NULL;
+      hdhomerun_data_states[id]->write_buffer_size = 0;
+   }
+   cdev_del(&hdhomerun_data_states[id]->cdev);
+   device_destroy(hdhomerun_class, hdhomerun_data_states[id]->dev);
 }
 EXPORT_SYMBOL(dvb_hdhomerun_data_delete_device);
 
 void dvb_hdhomerun_data_exit() {
-	DEBUG_FUNC(1);
+   DEBUG_FUNC(1);
 
-	if(hdhomerun_major != -1) {
-		unregister_chrdev_region(hdhomerun_major, hdhomerun_num_of_devices);
-		hdhomerun_major = -1;
+   if(hdhomerun_major != -1) {
+      unregister_chrdev_region(hdhomerun_major, hdhomerun_num_of_devices);
+      hdhomerun_major = -1;
 
-		class_destroy(hdhomerun_class);
-	}
+      class_destroy(hdhomerun_class);
+   }
 }
 EXPORT_SYMBOL(dvb_hdhomerun_data_exit);
