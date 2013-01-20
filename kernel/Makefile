@@ -1,9 +1,11 @@
 KERNEL_VERSION	:= `uname -r`
 KERNEL_DIR	:= /lib/modules/$(KERNEL_VERSION)/build
-
 PWD		:= $(shell pwd)
 
-EXTRA_CFLAGS += -Idrivers/media/dvb/dvb-core/ -Idrivers/media/dvb/frontends
+# 3.7.x
+ccflags-y	+= -Idrivers/media/dvb-core -Idrivers/media/frontends
+# Older than 3.7.x
+ccflags-y	+= -Idrivers/media/dvb/dvb-core -Idrivers/media/dvb/frontends
 
 dvb_hdhomerun-objs := dvb_hdhomerun_init.o dvb_hdhomerun_data.o dvb_hdhomerun_control.o
 obj-m += dvb_hdhomerun.o
@@ -16,11 +18,11 @@ obj-m += dvb_hdhomerun_fe.o
 
 all: dvb_hdhomerun
 dvb_hdhomerun:
-	@echo "Building driver..."
-	$(MAKE) -C $(KERNEL_DIR) SUBDIRS=$(PWD) modules
+	@echo "Building driver..." ccflags-y=$(ccflags-y)
+	$(MAKE) -C $(KERNEL_DIR)  M=$(PWD) modules
 
 install: dvb_hdhomerun
-	$(MAKE) -C $(KERNEL_DIR) SUBDIRS=$(PWD) modules_install
+	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) modules_install
 	depmod -aeF /boot/System.map-$(KERNEL_VERSION)
 
 clean:
