@@ -1,6 +1,16 @@
+dvbhdhomerun (0.0.15-1) lucid; urgency=low
+
+  * Version 0.0.15
+    * Fix page allocation error, was memory fragmentation (ticket 14).
+    * Default build type is now "Release" not "Debug"
+    * Enable libhdhomerun debugging from conf file.
+    * Kernel 3.7.x fix, dvb kernel headers moved. 
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 17 feb 2013 22:00:00 +0100
+
 dvbhdhomerun (0.0.14-1) lucid; urgency=low
 
-  * Preparing for Version 0.0.14
+  * Preparing for Version 0.0.15
     * Sort the tuners based on their name, so they appear in same order 
       in /dev/adapter/xxx.
 

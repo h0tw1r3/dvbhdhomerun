@@ -43,7 +43,11 @@ Control::Control(HdhomerunController* _hdhomerun)
      ERR() << "Couldn't open: " << m_device_name << endl;
     _exit(-1);
   }
-  pipe(pfd);
+
+  if (pipe(pfd) == -1) {
+     ERR() << "Could not create a pipe" << endl;
+     _exit(-1);
+  }
 }
 
 Control::~Control()

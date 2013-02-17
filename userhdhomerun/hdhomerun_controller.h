@@ -27,6 +27,7 @@
 
 class HdhomerunTuner;
 class Control;
+struct hdhomerun_debug_t;
 
 class HdhomerunController
 {
@@ -42,6 +43,8 @@ class HdhomerunController
   int m_maxDevices;
 
   Control* m_control;
+
+  struct hdhomerun_debug_t* m_dbg;
 };
 
 #endif // _hdhomerun_controller_h_

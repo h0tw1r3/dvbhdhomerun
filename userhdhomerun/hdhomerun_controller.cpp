@@ -21,6 +21,7 @@
 
 #include "hdhomerun_controller.h"
 
+#include "conf_inifile.h"
 #include "config.h"
 #include "hdhomerun_control.h"
 #include "hdhomerun_tuner.h"
@@ -33,8 +34,32 @@
 using namespace std;
 
 HdhomerunController::HdhomerunController(int _maxDevices) 
-  : m_maxDevices(_maxDevices)
+   : m_maxDevices(_maxDevices), m_dbg(0)
 {
+   //
+   // Enable libhdhomerun debugging based on conf file
+   //
+   ConfIniFile conf;
+
+   if(conf.OpenIniFile("/etc/dvbhdhomerun")) {
+      string libhdhomerunDebugEnable;
+      if(conf.GetSecValue("libhdhomerun", "enable", libhdhomerunDebugEnable)) {
+         if (libhdhomerunDebugEnable == "true") {
+	    string libhdhomerunLogFile("/var/log/dvbhdhomerun_libhdhomerun.log");
+	    if(conf.GetSecValue("libhdhomerun", "logfile", libhdhomerunLogFile)) {
+	       LOG() << "Custom log location for libhdhomerun: " << libhdhomerunLogFile << endl;
+	    }
+
+	    m_dbg = hdhomerun_debug_create();
+	    hdhomerun_debug_set_filename(m_dbg, libhdhomerunLogFile.c_str());
+	    hdhomerun_debug_enable(m_dbg);
+
+	    LOG() << "Logging libhdhomerun debug to: " << libhdhomerunLogFile << endl;
+	    hdhomerun_debug_printf(m_dbg, "Debug enabled\n");
+         } 
+      }
+   }
+
   //
   // Discover HDHomeRun's 
   //
@@ -67,7 +92,7 @@ HdhomerunController::HdhomerunController(int _maxDevices)
               << " and has " << (unsigned int)devices[i].tuner_count << " tuners" << endl;
 
         for (int j = 0; j < devices[i].tuner_count; ++j) {
-           HdhomerunTuner* tuner = new HdhomerunTuner(devices[i].device_id, devices[i].ip_addr, j);
+           HdhomerunTuner* tuner = new HdhomerunTuner(devices[i].device_id, devices[i].ip_addr, j, m_dbg);
            if(tuner->IsDisabled()) {
               delete tuner;
            }
@@ -85,7 +110,7 @@ HdhomerunController::HdhomerunController(int _maxDevices)
   const int MAX_TUNERS = 2; 
   for(int i = 0; i < numOfDevices; ++i) {
      for(int j = 0; j < MAX_TUNERS; ++j) {
-        HdhomerunTuner* tuner = new HdhomerunTuner(devices[i].device_id, devices[i].ip_addr, j);
+        HdhomerunTuner* tuner = new HdhomerunTuner(devices[i].device_id, devices[i].ip_addr, j, m_dbg);
         if(tuner->IsDisabled()) {
            delete tuner;
         }
@@ -134,6 +159,9 @@ HdhomerunController::~HdhomerunController()
     tuner->stop();
     delete tuner;
   }
+
+  hdhomerun_debug_close(m_dbg,1000);
+  hdhomerun_debug_destroy(m_dbg);
 }
 
 

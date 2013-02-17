@@ -1,5 +1,5 @@
 PACKAGE_NAME="dvbhdhomerun"
-PACKAGE_VERSION="0.0.14-1"
+PACKAGE_VERSION="0.0.15-1"
 AUTOINSTALL="yes"
 MAKE="make"
 CLEAN="make clean"

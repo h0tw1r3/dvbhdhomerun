@@ -25,3 +25,7 @@ use_full_name=true
 disable=true
 
  
+# Enable additional logging  from libhdhomerun itself
+[libhdhomerun]
+#enable=true
+#logfile=/var/log/dvbhdhomerun_libhdhomerun.log

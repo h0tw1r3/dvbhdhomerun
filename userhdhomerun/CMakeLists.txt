@@ -8,7 +8,7 @@ ENDIF(COMMAND cmake_policy)
 SET(LIBHDHOMERUN_PATH /usr/lib/libhdhomerun)
 
 SET(CMAKE_BUILD_TYPE Release)
-SET(CMAKE_CXX_FLAGS_PROFILE "-pg")
+#SET(CMAKE_CXX_FLAGS_PROFILE "-pg")
 
 SET(userhdhomerun_HDRS
   conf_inifile.h

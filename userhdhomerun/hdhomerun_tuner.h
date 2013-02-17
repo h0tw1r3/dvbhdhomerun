@@ -42,7 +42,7 @@ public:
       };
 
 public:
-   HdhomerunTuner(int _device_id, int _device_ip, int _tuner);
+   HdhomerunTuner(int _device_id, int _device_ip, int _tuner, struct hdhomerun_debug_t* _dbg);
    ~HdhomerunTuner();
   
    void run();
