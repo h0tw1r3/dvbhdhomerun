@@ -32,6 +32,6 @@ UserHDHomerun:
 * Use strstr on "atsc"/"cablecard" or "dvbt" to autodetect. OpenElec has a
   patch.
 
-* Timestamp in log?
++ Timestamp in log?
 
 * Add locking of tuner?

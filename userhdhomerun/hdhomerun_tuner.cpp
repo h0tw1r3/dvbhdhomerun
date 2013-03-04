@@ -290,7 +290,7 @@ int HdhomerunTuner::ReadStatus()
       }
    }
 
-   LOG() << "sym qual: " << hdhomerun_status.symbol_error_quality << endl;
+   LOG() << "sym qual: " << dec << hdhomerun_status.symbol_error_quality << endl;
    
    return status;
 }
@@ -301,7 +301,7 @@ int HdhomerunTuner::ReadSignalStrength()
   
    struct hdhomerun_tuner_status_t hdhomerun_status;
    int ret = hdhomerun_device_get_tuner_status(m_device, NULL, &hdhomerun_status);
-   LOG() << "strength: " << hdhomerun_status.signal_strength << " sym qual: " <<  hdhomerun_status.symbol_error_quality << " sig to noise:" << hdhomerun_status.signal_to_noise_quality << endl;
+   LOG() << "strength: " << dec << hdhomerun_status.signal_strength << " sym qual: " <<  hdhomerun_status.symbol_error_quality << " sig to noise:" << hdhomerun_status.signal_to_noise_quality << endl;
 
    status = (0xffff *  hdhomerun_status.signal_strength) / 100;
 

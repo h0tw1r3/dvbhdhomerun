@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 using namespace std;
@@ -73,7 +74,15 @@ int LogFile::overflow(int _i)
    if(m_disabled) {
       return _i;
    }
-   
+
+   if(m_buffer.empty()) {
+      time_t rawtime;
+      time(&rawtime);
+      string timestamp(ctime(&rawtime));
+      m_buffer += timestamp.substr(0, timestamp.length() - 1);
+      m_buffer += " ";
+   }
+     
    m_buffer += _i;
    
    if(_i == '\n')  {
