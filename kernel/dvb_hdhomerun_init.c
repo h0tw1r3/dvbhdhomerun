@@ -47,6 +47,11 @@ MODULE_VERSION(HDHOMERUN_VERSION);
 
 DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 
+#ifndef __devinit
+#define __devinit
+#define __devinitdata
+#endif
+
 extern int hdhomerun_debug_mask;
 
 struct dvb_hdhomerun {
