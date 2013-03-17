@@ -1,4 +1,11 @@
-dvbhdhomerun (0.0.15-1) lucid; urgency=low
+dvbhdhomerun (0.0.16~natty) natty; urgency=low
+
+  * Version 0.0.16
+    * Accidently uploaded wrong version to launchpad, need new. 
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 17 mar 2013 12:00:00 +0100
+
+dvbhdhomerun (0.0.15~natty) natty; urgency=low
 
   * Version 0.0.15
     * Fix page allocation error, was memory fragmentation (ticket 14).
