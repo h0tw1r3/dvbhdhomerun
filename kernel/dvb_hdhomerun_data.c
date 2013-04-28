@@ -49,7 +49,6 @@ struct hdhomerun_data_state {
    struct cdev cdev;
    struct device *device;
    char *write_buffer;
-   ssize_t write_buffer_size;
 };
 
 static dev_t hdhomerun_major = -1;
@@ -65,38 +64,23 @@ static ssize_t hdhomerun_data_write(struct file *f, const char __user *buf,
                                     size_t count, loff_t *offset)
 {
    struct hdhomerun_data_state *state = f->private_data;
+   int copied = 0;
 
    DEBUG_FUNC(1);
    DEBUG_OUT(HDHOMERUN_DATA, "Count: %Zu, offset %lld\n", count, *offset);
 	
-   // new buffer need to be allocated ?
-   if( (state->write_buffer == NULL) || (count > state->write_buffer_size) ) {
-      // free old buffer
-      if(state->write_buffer) {
-         kfree(state->write_buffer);
-         state->write_buffer = NULL;
-         state->write_buffer_size = 0;
-      }
-
-      // allocate a bigger buffer
-      state->write_buffer = kmalloc(count, GFP_KERNEL);
-      if(!state->write_buffer) {
-         printk(KERN_ERR "hdhomerun: unable to allocate buffer of %Zu bytes for device %d\n", count, state->id);
-         return -ENOMEM;
-      }
-      state->write_buffer_size = count;
-      printk(KERN_INFO "hdhomerun: allocated buffer of %Zu bytes for device %d\n", count, state->id);
-   }
-
-   // write_buffer is allocated and is big enough
-   if (copy_from_user(state->write_buffer, buf, count)) {
-      return -EFAULT;
-   }
+   while (copied < count) {
+     int to_copy = min(count - copied, PAGE_SIZE);
+     if (copy_from_user(state->write_buffer, buf + copied, to_copy)) {
+       return -EFAULT;
+     }
 	
-   /* Feed stuff to V4l-DVB */
-   dvb_dmx_swfilter(state->dvb_demux, state->write_buffer, count);
+     /* Feed stuff to V4l-DVB */
+     dvb_dmx_swfilter(state->dvb_demux, state->write_buffer, to_copy);
+     copied += to_copy;
+   }
 
-   return count;
+   return copied;
 }
 
 static int hdhomerun_data_open(struct inode *inode, struct file *file)
@@ -181,8 +165,13 @@ int dvb_hdhomerun_data_create_device(struct dvb_demux *dvb_demux, int id) {
    state->id = id;
 
    /* buffer */
-   state->write_buffer = NULL;
-   state->write_buffer_size = 0;
+   state->write_buffer = (char *)get_zeroed_page(GFP_KERNEL);
+   if (!state->write_buffer) {
+      printk(KERN_ERR
+             "HDHomeRun: Cannot allocate write buffer for device %d\n",
+             id);
+      return -ENOMEM;
+   }
 
    /* Create dev_t for this tuner */
    major = MAJOR(hdhomerun_major);
@@ -222,9 +211,8 @@ void dvb_hdhomerun_data_delete_device(int id) {
 
    /* free allocated buffer */
    if(hdhomerun_data_states[id]->write_buffer != NULL) {
-      kfree(hdhomerun_data_states[id]->write_buffer);
+      free_page((unsigned long)hdhomerun_data_states[id]->write_buffer);
       hdhomerun_data_states[id]->write_buffer = NULL;
-      hdhomerun_data_states[id]->write_buffer_size = 0;
    }
    cdev_del(&hdhomerun_data_states[id]->cdev);
    device_destroy(hdhomerun_class, hdhomerun_data_states[id]->dev);

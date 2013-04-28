@@ -16,6 +16,8 @@ service tvheadend start
 
 Kernel Module:
 
+* Single page alloc fra Klaus.
+
 * Remove unneeded DVB functions.
 
 * Init:
