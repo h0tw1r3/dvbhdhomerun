@@ -7,13 +7,16 @@ ccflags-y	+= -Idrivers/media/dvb-core -Idrivers/media/frontends
 # Older than 3.7.x
 ccflags-y	+= -Idrivers/media/dvb/dvb-core -Idrivers/media/dvb/frontends
 
+ifneq ($(KERNELRELEASE),)
+# Hack for distributions not including DVB headers (Ubuntu 13.04)
+ccflags-y       +=  -I$(src)/kernelheaders
+endif
+
 dvb_hdhomerun-objs := dvb_hdhomerun_init.o dvb_hdhomerun_data.o dvb_hdhomerun_control.o
 obj-m += dvb_hdhomerun.o
 
-#dvb_hdhomerun_core-objs := dvb_hdhomerun_core.o
 obj-m += dvb_hdhomerun_core.o
 
-#dvb_hdhomerun_fe-objs := dvb_hdhomerun_fe.o
 obj-m += dvb_hdhomerun_fe.o
 
 all: dvb_hdhomerun
