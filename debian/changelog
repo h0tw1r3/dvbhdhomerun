@@ -1,4 +1,11 @@
-dvbhdhomerun (0.0.16~raring) raring; urgency=low
+dvbhdhomerun (0.0.16~raring3) raring; urgency=low
+
+  * Version 0.0.16 (for raring)
+    * REALLY add missing linux kernel headers for Ubuntu 13.04
+
+ -- Villy Thomsen <tfylliv@gmail.com>  Sun, 9 jun 2013 13:00:00 +0100
+
+dvbhdhomerun (0.0.16~raring2) raring; urgency=low
 
   * Version 0.0.16 (for raring)
     * As a hack, add missing linux kernel headers for Ubuntu 13.04

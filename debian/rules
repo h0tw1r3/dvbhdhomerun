@@ -41,6 +41,7 @@ install: build
 	install -d "$(SRC)/$(NAME)-$(VERSION)"
 	cp -a kernel/*.c "$(SRC)/$(NAME)-$(VERSION)"	
 	cp -a kernel/*.h "$(SRC)/$(NAME)-$(VERSION)"	
+	cp -R kernel/kernelheaders "$(SRC)/$(NAME)-$(VERSION)"	
 	cp -a kernel/Makefile "$(SRC)/$(NAME)-$(VERSION)"	
 	chmod 644 -R "$(SRC)/$(NAME)-$(VERSION)"
 
@@ -51,6 +52,7 @@ install: build
 	# Copy only the driver source to the proper location
 	cp kernel/*.h  debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
 	cp kernel/*.c  debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
+	cp -R kernel/kernelheaders debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
 	cp kernel/Makefile debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
 	# Copy the needed debian/ pieces to the proper location
 	cp debian/*modules.in* \
