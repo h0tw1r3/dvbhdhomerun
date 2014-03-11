@@ -75,8 +75,7 @@ binary-arch: build install
 	dh_installchangelogs debian/changelog
 	dh_installlogrotate
 	dh_installudev --priority=59
-#	dh_installinit --upstart-only --no-start
-	dh_installinit --upstart-only
+	dh_installinit
 	dh_installdocs
 	dh_link
 	dh_strip --dbg-package=dvbhdhomerun-utils-dbg

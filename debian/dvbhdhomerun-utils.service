@@ -1,0 +1,13 @@
+[Unit]
+Description=HDHomeRun DVB Driver Userspace Daemon
+After=network.target
+
+[Service]
+ExecStart=/bin/userhdhomerun
+ExecStartPre=-/sbin/modprobe dvb_hdhomerun
+ExecStopPost=-/sbin/modprobe -r dvb_hdhomerun dvb_hdhomerun_fe dvb_hdhomerun_core
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

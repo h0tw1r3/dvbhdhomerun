@@ -1,0 +1,87 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          dvbhdhomerun-utils
+# Required-Start:    $local_fs $remote_fs $syslog $network
+# Required-Stop:     $local_fs $remote_fs $syslog $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Starts and stops the hdhomerun dvb driver and utility daemon
+# Description:       Starts and stops the hdhomerun dvb driver and utility daemon
+### END INIT INFO
+
+NAME="userhdhomerun"
+DESC="DVB HDHomerun Service"
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/bin/$NAME
+PIDFILE=/var/run/${NAME}.pid
+CONFIGFILE=/etc/dvbhdhomerun
+
+[ -x "$DAEMON" ] || exit 0
+
+. /lib/lsb/init-functions
+
+RETVAL=0
+sanitychecks() {
+        # Do sanity checks before we start..
+        if [ ! -e "$CONFIGFILE" ]; then
+                echo "Error: configuration file $CONFIGFILE is missing!"
+                echo "The driver has not been correctly installed and cannot start."
+                exit 1
+        elif [ -s $PIDFILE ] && kill -0 `head -1 $PIDFILE` >/dev/null ; then
+		echo
+                echo "Daemon already running"
+                exit 0
+        fi
+}
+
+start() {
+	log_daemon_msg "Starting $DESC" "$NAME"
+	sanitychecks
+	modprobe -q dvb_hdhomerun 2>/dev/null || :
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- -f -g video
+	RETVAL=$?
+	log_end_msg $RETVAL
+
+	udevadm settle || true;
+
+    log_end_msg 0
+}
+
+stop() {
+	log_daemon_msg "Stopping $DESC" "$NAME"
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE --signal TERM --exec $DAEMON
+	rm -f $PIDFILE
+	modprobe -r dvb_hdhomerun dvb_hdhomerun_fe dvb_hdhomerun_core 2>/dev/null
+	log_end_msg 0
+}
+
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+    start|stop|restart)
+		$1
+        ;;
+    status)
+        exitval=0
+        log_daemon_msg "Checking status of $DESC" "$NAME"
+        if pidofproc -p $PIDFILE $DAEMON  > /dev/null; then
+            log_progress_msg "running"
+            log_end_msg 0
+        else
+            log_progress_msg "apparently not running"
+            log_end_msg 1 || true
+            exitval=1
+        fi
+		;;
+	force-reload)
+		restart
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|force-reload|status}"
+		exit 1
+		;;
+esac
+exit $RETVAL

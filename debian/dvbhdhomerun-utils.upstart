@@ -8,13 +8,12 @@ author          "Villy Thomsen <tfylliv@gmail.com>"
 start on (filesystem and net-device-up IFACE!=lo and started udev)
 stop on starting shutdown
 
-expect fork
+script
+    exec /bin/userhdhomerun > /var/log/dvbhdhomerun_stdout.log 2> /var/log/dvbhdhomerun_stderr.log
+end script
 
 pre-start exec modprobe dvb_hdhomerun
-
-script
-    exec /bin/userhdhomerun -f > /var/log/dvbhdhomerun_stdout.log 2> /var/log/dvbhdhomerun_stderr.log
-end script
+post-stop exec modprobe -r dvb_hdhomerun dvb_hdhomerun_fe dvb_hdhomerun_core 2>/dev/null
 
 emits dvbhdhomerun
 
