@@ -5,7 +5,9 @@ IF(COMMAND cmake_policy)
    CMAKE_policy(SET CMP0003 NEW)
 ENDIF(COMMAND cmake_policy)
 
-SET(LIBHDHOMERUN_PATH /usr/lib/libhdhomerun)
+SET(LIBHDHOMERUN_PATH /usr/include/libhdhomerun)
+# libhdhomerun-dev headers were mistakenly put here once upon a time
+SET(LIBHDHOMERUN_MISTAKE_PATH /usr/lib/libhdhomerun)
 
 SET(CMAKE_BUILD_TYPE Release)
 #SET(CMAKE_CXX_FLAGS_PROFILE "-pg")
@@ -30,15 +32,18 @@ SET(userhdhomerun_SRCS
 
 INCLUDE(CheckStructHasMember)
 CHECK_STRUCT_HAS_MEMBER("struct hdhomerun_discover_device_t" tuner_count ${LIBHDHOMERUN_PATH}/hdhomerun.h HAVE_HDHOMERUN_TUNER_COUNT)
+CHECK_STRUCT_HAS_MEMBER("struct hdhomerun_discover_device_t" tuner_count ${LIBHDHOMERUN_MISTAKE_PATH}/hdhomerun.h HAVE_HDHOMERUN_TUNER_COUNT)
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_BINARY_DIR} 
 	${LIBHDHOMERUN_PATH}
+	${LIBHDHOMERUN_MISTAKE_PATH}
 )
 
 LINK_DIRECTORIES(
 	${LIBHDHOMERUN_PATH}
+	${LIBHDHOMERUN_MISTAKE_PATH}
 )
 
 ADD_EXECUTABLE(userhdhomerun main.cpp ${userhdhomerun_SRCS})
