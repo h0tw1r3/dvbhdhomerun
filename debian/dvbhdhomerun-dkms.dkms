@@ -1,7 +1,7 @@
 PACKAGE_NAME="dvbhdhomerun"
-PACKAGE_VERSION="0.0.16~natty"
+PACKAGE_VERSION="#MODULE_VERSION#"
 AUTOINSTALL="yes"
-MAKE="make"
+MAKE="./prep.sh"
 CLEAN="make clean"
 BUILT_MODULE_NAME[0]="dvb_hdhomerun"
 BUILT_MODULE_NAME[1]="dvb_hdhomerun_core"
@@ -9,5 +9,3 @@ BUILT_MODULE_NAME[2]="dvb_hdhomerun_fe"
 DEST_MODULE_LOCATION[0]="/kernel/drivers/media/dvb"
 DEST_MODULE_LOCATION[1]="/kernel/drivers/media/dvb"
 DEST_MODULE_LOCATION[2]="/kernel/drivers/media/dvb"
-
-

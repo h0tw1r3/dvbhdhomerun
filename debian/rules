@@ -32,7 +32,7 @@ install: build
 	dh_prep
 	dh_installdirs
 	dh_installdirs -a usr/share/modass/overrides
-	dh_dkms
+	dh_dkms -V
 
 	# User Space Application
 	$(MAKE) -C userhdhomerun PREFIX=$(CURDIR)/debian/dvbhdhomerun-utils install
@@ -44,6 +44,7 @@ install: build
 	cp -R kernel/kernelheaders "$(SRC)/$(NAME)-$(VERSION)"	
 	cp -a kernel/Makefile "$(SRC)/$(NAME)-$(VERSION)"	
 	chmod 644 -R "$(SRC)/$(NAME)-$(VERSION)"
+	cp -a kernel/prep.sh "$(SRC)/$(NAME)-$(VERSION)"
 
 	# Module assistant
 	# Create the directories to install the source into
@@ -52,8 +53,10 @@ install: build
 	# Copy only the driver source to the proper location
 	cp kernel/*.h  debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
 	cp kernel/*.c  debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
-	cp -R kernel/kernelheaders debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
+	#cp -R kernel/kernelheaders debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
 	cp kernel/Makefile debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
+	cp kernel/prep.sh debian/$(NAME_MODASS)/usr/src/modules/$(NAME)
+
 	# Copy the needed debian/ pieces to the proper location
 	cp debian/*modules.in* \
 		debian/$(NAME_MODASS)/usr/src/modules/$(NAME)/debian

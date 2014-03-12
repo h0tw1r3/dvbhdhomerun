@@ -3,7 +3,7 @@ Section: unknown
 Priority: optional
 Maintainer: Villy Thomsen <tfylliv@gmail.com>
 Build-Depends: debhelper (>= 7)
-Standards-Version: 3.8.3
+Standards-Version: 3.9.3
 
 Package: dvbhdhomerun-modules-_KVERS_
 Architecture: any

@@ -7,13 +7,6 @@ ccflags-y	+= -Idrivers/media/dvb-core -Idrivers/media/frontends
 # Older than 3.7.x
 ccflags-y	+= -Idrivers/media/dvb/dvb-core -Idrivers/media/dvb/frontends
 
-# Hack for distributions not including DVB headers (Ubuntu 13.04+)
-ifneq (,$(findstring 3.8, $(KERNELRELEASE)))
-	ccflags-y       +=  -I$(src)/kernelheaders
-else ifneq (,$(findstring 3.11, $(KERNELRELEASE)))
-	ccflags-y       +=  -I$(src)/kernelheaders/3.11
-endif
-
 dvb_hdhomerun-objs := dvb_hdhomerun_init.o dvb_hdhomerun_data.o dvb_hdhomerun_control.o
 obj-m += dvb_hdhomerun.o
 
@@ -33,4 +26,4 @@ install: dvb_hdhomerun
 clean:
 	rm -f *~
 	rm -f Module.symvers Module.markers modules.order
-	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
+	#$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
