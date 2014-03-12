@@ -1,3 +1,11 @@
+dvbhdhomerun (0.0.16+nmu1) UNRELEASED; urgency=medium
+
+  * Non-maintainer upload.
+  * Removed in-tree kernel source headers.
+  * Hopefully a better way of building the module with dkms.
+
+ -- Jeffrey Clark <dude@zaplabs.com>  Wed, 12 Mar 2014 14:02:34 -0500
+
 dvbhdhomerun (0.0.16~raring3) raring; urgency=low
 
   * Version 0.0.16 (for raring)
