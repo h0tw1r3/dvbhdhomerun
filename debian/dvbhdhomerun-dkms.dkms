@@ -1,7 +1,7 @@
 PACKAGE_NAME="dvbhdhomerun"
 PACKAGE_VERSION="#MODULE_VERSION#"
 AUTOINSTALL="yes"
-MAKE="./prep.sh"
+MAKE="make"
 CLEAN="make clean"
 BUILT_MODULE_NAME[0]="dvb_hdhomerun"
 BUILT_MODULE_NAME[1]="dvb_hdhomerun_core"
