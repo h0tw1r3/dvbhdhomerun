@@ -1,10 +1,10 @@
 Source: dvbhdhomerun
 Section: video
 Priority: extra
-Maintainer: Villy Thomsen <tfylliv@gmail.com>
+Maintainer: Jeffrey Clark <dude@zaplabs.com>
 Build-Depends: debhelper (>= 7), cmake, libhdhomerun-dev, dkms
 Standards-Version: 3.9.4
-Homepage: http://sourceforge.net/projects/dvbhdhomerun
+Homepage: https://github.com/h0tw1r3/dvbhdhomerun
 
 Package: dvbhdhomerun-utils
 Architecture: any
@@ -30,9 +30,9 @@ Description: Source for the dvbhdhomerun kernel driver.
 
 Package: dvbhdhomerun-dkms
 Architecture: all
-Depends: dkms (>= 1.95), build-essential, debhelper (>= 7), make, wget, bzip2, linux-headers-generic | linux-headers
+Depends: dkms (>= 1.95), build-essential, debhelper (>= 7), make, curl, bzip2, linux-headers-generic | linux-headers
 Description: Source for the dvbhdhomerun kernel driver.
  This package provides the source code for the dvbhdhomerun kernel modules, to
  be build with dkms. The dvbhdhomerun-utils package is required in order to make
  use of these modules. Linux headers do no provide the necessary includes to compile
- so wget is used to download them at build time.
+ so curl is used to download them at build time.
