@@ -2,7 +2,7 @@ Source: dvbhdhomerun
 Section: video
 Priority: extra
 Maintainer: Jeffrey Clark <dude@zaplabs.com>
-Build-Depends: debhelper (>= 7), cmake, libhdhomerun-dev, dkms
+Build-Depends: debhelper (>= 7), cmake, libhdhomerun-dev, dkms, dh-systemd
 Standards-Version: 3.9.4
 Homepage: https://github.com/h0tw1r3/dvbhdhomerun
 
