@@ -10,7 +10,7 @@ obj-m += dvb_hdhomerun.o
 obj-m += dvb_hdhomerun_core.o
 obj-m += dvb_hdhomerun_fe.o
 
-ccflags-y	+= -I$(src)/headers/$(KVERMAJ).$(KVERMIN)
+ccflags-y	+= -I$(src)/headers/$(KVERMAJ).$(KVERMIN) -D__DVB_CORE__
 
 all: dlheaders dvb_hdhomerun
 
