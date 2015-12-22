@@ -49,7 +49,7 @@ struct dvb_hdhomerun_fe_state {
 
 extern int hdhomerun_debug_mask;
 
-static int dvb_hdhomerun_fe_read_status(struct dvb_frontend* fe, enum fe_status* status)
+static int dvb_hdhomerun_fe_read_status(struct dvb_frontend* fe, fe_status_t* status)
 {
 	struct dvbhdhomerun_control_mesg mesg;
 	struct dvb_hdhomerun_fe_state* state = fe->demodulator_priv;
@@ -60,7 +60,7 @@ static int dvb_hdhomerun_fe_read_status(struct dvb_frontend* fe, enum fe_status*
 	mesg.id = state->id;
 	hdhomerun_control_post_and_wait(&mesg);
 
-	*status = mesg.u.frontend_status;
+	*status = mesg.u.fe_status;
 
 	return 0;
 }
@@ -203,7 +203,7 @@ static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, bool re_tune,
 #else
 static int dvb_hdhomerun_fe_tune(struct dvb_frontend *fe, struct dvb_frontend_parameters *params,
 #endif
-					unsigned int mode_flags, unsigned int *delay, enum fe_status *status)
+					unsigned int mode_flags, unsigned int *delay, fe_status_t *status)
 {
    int ret;
 	DEBUG_FUNC(1);

@@ -219,9 +219,9 @@ void Control::FE_READ_Status(struct dvbhdhomerun_control_mesg& _mesg)
 
   HdhomerunTuner* tuner = m_hdhomerun->GetTuner(_mesg.id);
   if(tuner) {
-     fe_status status = (fe_status)tuner->ReadStatus();
+     fe_status_t status = (fe_status_t)tuner->ReadStatus();
   
-     _mesg.u.frontend_status = status;
+     _mesg.u.fe_status = status;
   }
   else {
      ERR() << "Tuner id does not exist!" << _mesg.id << endl;
