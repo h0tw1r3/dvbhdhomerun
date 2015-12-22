@@ -16,12 +16,12 @@ all: dlheaders dvb_hdhomerun
 
 dlheaders: dlmain
 	@echo Downloading kernel header dependencies...
-	@$(foreach var,$(shell grep -h ^\\\#include\ \" $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/*.[ch] 2>/dev/null | sort -u | sed 's/\#include "\(.*\)"/\1/'),curl -# -L -o $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/$(var) https://raw.githubusercontent.com/torvalds/linux/master/drivers/media/dvb-core/$(var);)
+	@$(foreach var,$(shell grep -h ^\\\#include\ \" $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/*.[ch] 2>/dev/null | sort -u | sed 's/\#include "\(.*\)"/\1/'),curl -# -L -o $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/$(var) https://github.com/torvalds/linux/raw/v$(KVERMAJ).$(KVERMIN)/drivers/media$(HEADERSUBFOLDER)/dvb-core/$(var);)
 
 dlmain:
 	@echo Downloading kernel headers...
 	@mkdir -p $(PWD)/headers/$(KVERMAJ).$(KVERMIN)
-	@$(foreach var,$(shell grep -h ^\\\#include\ \" *.[ch] 2>/dev/null | grep -v hdhomerun | sort -u | sed 's/\#include "\(.*\)"/\1/'),curl -# -L -o $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/$(var) https://raw.githubusercontent.com/torvalds/linux/master/drivers/media/dvb-core/$(var);)
+	@$(foreach var,$(shell grep -h ^\\\#include\ \" *.[ch] 2>/dev/null | grep -v hdhomerun | sort -u | sed 's/\#include "\(.*\)"/\1/'),curl -# -L -o $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/$(var) https://github.com/torvalds/linux/raw/v$(KVERMAJ).$(KVERMIN)/drivers/media$(HEADERSUBFOLDER)/dvb-core/$(var);)
 
 dvb_hdhomerun:
 	$(MAKE) -C /lib/modules/$(KERNELRELEASE)/build M=$(PWD) modules
