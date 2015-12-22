@@ -3,7 +3,7 @@ KVERCLEAN       := $(shell echo $(KERNELRELEASE) | cut -f1 -d-)
 KVERMAJ         := $(shell echo $(KVERCLEAN) | cut -f1 -d.)
 KVERMIN         := $(shell echo $(KVERCLEAN) | cut -f2 -d.)
 PWD		:= $(shell pwd)
-HEADERSUBFOLDER  = $(shell [ $(KVERMAJ) -gt 2 -a $(KVERMIN) -gt 6 ] && echo || echo /dvb)
+HEADERSUBFOLDER  = $(shell [ $(KVERMAJ) -eq 2 -a $(KVERMIN) -lt 7 ] && echo /dvb || echo )
 
 dvb_hdhomerun-objs := dvb_hdhomerun_init.o dvb_hdhomerun_data.o dvb_hdhomerun_control.o
 obj-m += dvb_hdhomerun.o
