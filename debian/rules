@@ -62,9 +62,7 @@ install: build
 
 	ln -s ../packages/default.sh debian/dvbhdhomerun-utils/usr/share/modass/overrides/dvbhdhomerun-source
 
-	dh_systemd_enable
 	dh_install
-	dh_systemd_start
 
 # Build architecture-independent files here.
 binary-indep: build install
