@@ -12,13 +12,13 @@ obj-m += dvb_hdhomerun_fe.o
 
 ccflags-y	+= -I$(src)/headers/$(KVERMAJ).$(KVERMIN) -D__DVB_CORE__
 
-all: dlheaders dvb_hdhomerun
+all: headers dvb_hdhomerun
 
-dlheaders: dlmain
+headers: headers/$(KVERMAJ).$(KVERMIN)
 	@echo Downloading kernel header dependencies...
 	@$(foreach var,$(shell grep -h ^\\\#include\ \" $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/*.[ch] 2>/dev/null | sort -u | sed 's/\#include "\(.*\)"/\1/'),curl -# -L -o $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/$(var) https://github.com/torvalds/linux/raw/v$(KVERMAJ).$(KVERMIN)/drivers/media$(HEADERSUBFOLDER)/dvb-core/$(var);)
 
-dlmain:
+headers/$(KVERMAJ).$(KVERMIN):
 	@echo Downloading kernel headers...
 	@mkdir -p $(PWD)/headers/$(KVERMAJ).$(KVERMIN)
 	@$(foreach var,$(shell grep -h ^\\\#include\ \" *.[ch] 2>/dev/null | grep -v hdhomerun | sort -u | sed 's/\#include "\(.*\)"/\1/'),curl -# -L -o $(PWD)/headers/$(KVERMAJ).$(KVERMIN)/$(var) https://github.com/torvalds/linux/raw/v$(KVERMAJ).$(KVERMIN)/drivers/media$(HEADERSUBFOLDER)/dvb-core/$(var);)
