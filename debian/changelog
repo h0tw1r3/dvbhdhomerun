@@ -1,3 +1,10 @@
+dvbhdhomerun (0.0.16+nmu4) UNRELEASED; urgency=medium
+
+  * Non-maintainer upload.
+  * Git commit fa3795a
+
+ -- Jeffrey Clark <dude@zaplabs.com>  Tue, 22 Dec 2015 15:16:57 -0600
+
 dvbhdhomerun (0.0.16+nmu3) UNRELEASED; urgency=medium
 
   * Non-maintainer upload.
