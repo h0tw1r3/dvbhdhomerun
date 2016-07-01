@@ -60,7 +60,7 @@ struct dvbhdhomerun_control_mesg {
 	unsigned int type;
 	union {
 		unsigned int frequency;
-		fe_status_t fe_status;
+		enum fe_status frontend_status;
 		int16_t signal_strength;
 		struct dmx_pes_filter_params dmx_pes_filter;
 		struct hdhomerun_dvb_demux_feed demux_feed;
