@@ -268,23 +268,30 @@ int dvb_hdhomerun_control_init() {
 	/* Buffer for sending message between kernel/userspace */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
 	control_fifo_user = *(kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_user));
-#else
-	kfifo_alloc(&control_fifo_user, control_bufsize, GFP_KERNEL);
-#endif
-
 	if (IS_ERR(&control_fifo_user)) {
 		return PTR_ERR(&control_fifo_user);
 	}
+#else
+	ret = kfifo_alloc(&control_fifo_user, control_bufsize, GFP_KERNEL);
+	if (ret) {
+		printk(KERN_ERR "Error kfifo_alloc\n");
+		return PTR_ERR(&control_fifo_user);
+	}
+#endif
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,33)
 	control_fifo_kernel = *(kfifo_alloc(control_bufsize, GFP_KERNEL, &control_spinlock_kernel));
-#else
-	kfifo_alloc(&control_fifo_kernel, control_bufsize, GFP_KERNEL);
-#endif 
-
 	if (IS_ERR(&control_fifo_kernel)) {
 		return PTR_ERR(&control_fifo_kernel);
 	}
+#else
+	ret = kfifo_alloc(&control_fifo_kernel, control_bufsize, GFP_KERNEL);
+	if (ret) {
+		printk(KERN_ERR "Error kfifo_alloc\n");
+		return PTR_ERR(&control_fifo_kernel);
+	}
+#endif 
+
 	init_waitqueue_head(&control_readq);
 	init_waitqueue_head(&inq);
 	init_waitqueue_head(&outq);

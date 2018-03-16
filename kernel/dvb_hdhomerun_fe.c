@@ -103,7 +103,10 @@ static int dvb_hdhomerun_fe_read_ucblocks(struct dvb_frontend* fe, u32* ucblocks
 	return 0;
 }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0)
+/* To clarify - Debian stretch kernel 4.9.0-6-amd64 */
+static int dvb_hdhomerun_fe_get_frontend(struct dvb_frontend* fe, struct dtv_frontend_properties *p)
+#elif if LINUX_VERSION_CODE >= KERNEL_VERSION(3,3,0)
 static int dvb_hdhomerun_fe_get_frontend(struct dvb_frontend* fe)
 #else
 static int dvb_hdhomerun_fe_get_frontend(struct dvb_frontend* fe, struct dvb_frontend_parameters *p)
