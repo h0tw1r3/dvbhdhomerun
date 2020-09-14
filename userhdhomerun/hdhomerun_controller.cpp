@@ -71,7 +71,7 @@ HdhomerunController::HdhomerunController(int _maxDevices)
   // ...really fragile API design...
   memset(devices, 0, sizeof(devices));
 
-  int numOfDevices = hdhomerun_discover_find_devices_custom(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, devices, m_maxDevices);
+  int numOfDevices = hdhomerun_discover_find_devices_custom_v2(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, devices, m_maxDevices);
   LOG() << "Num of devices = " << numOfDevices << endl;
 
   if(numOfDevices == 0) {
